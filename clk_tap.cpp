@@ -10,5 +10,12 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 namespace clk {
 
+class Tap
+    : public flext_base
+{
+    FLEXT_HEADER(Tap,flext_base)
+};
+
+FLEXT_LIB("clk.tap",Tap)
 
 } // namespace

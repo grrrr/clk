@@ -10,5 +10,12 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 namespace clk {
 
+class Sync
+    : public flext_base
+{
+    FLEXT_HEADER(Sync,flext_base)
+};
+
+FLEXT_LIB("clk.sync",Sync)
 
 } // namespace

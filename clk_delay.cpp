@@ -10,5 +10,12 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 namespace clk {
 
+class Delay
+    : public flext_dsp
+{
+    FLEXT_HEADER(Delay,flext_dsp)
+};
+
+FLEXT_LIB("clk.delay",Delay)
 
 } // namespace

@@ -10,5 +10,12 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 namespace clk {
 
+class Metro
+    : public flext_dsp
+{
+    FLEXT_HEADER(Metro,flext_dsp)
+};
+
+FLEXT_LIB("clk.metro",Metro)
 
 } // namespace
