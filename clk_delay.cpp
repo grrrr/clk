@@ -12,10 +12,17 @@ namespace clk {
 
 class Delay
     : public flext_dsp
+    , public Client
 {
     FLEXT_HEADER(Delay,flext_dsp)
+
+public:
+    Delay(int argc,const t_atom *argv)
+        : Client(argc,argv)
+    {
+    }
 };
 
-FLEXT_LIB("clk.delay",Delay)
+FLEXT_LIB_V("clk.delay",Delay)
 
 } // namespace

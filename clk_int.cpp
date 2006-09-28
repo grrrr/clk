@@ -10,19 +10,23 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 namespace clk {
 
-class Metro
-    : public flext_dsp
-    , public Client
+class Sync
+    : public flext_base
+    , public Master
 {
-    FLEXT_HEADER(Metro,flext_dsp)
+    FLEXT_HEADER(Sync,flext_base)
 
 public:
-    Metro(int argc,const t_atom *argv)
-        : Client(argc,argv)
+    Sync(int argc,const t_atom *argv)
+        : Master(argc,argv)
     {
     }
+
+	void m_set(double y) { settime(Time(),y); }
+
+    void m_double(float a,float b)  { m_set((double)a+(double)b); }
 };
 
-FLEXT_LIB_V("clk.metro",Metro)
+FLEXT_LIB_V("clk.sync",Sync)
 
 } // namespace

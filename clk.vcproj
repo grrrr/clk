@@ -121,6 +121,9 @@
 			RelativePath=".\clk_delay.cpp">
 		</File>
 		<File
+			RelativePath=".\clk_int.cpp">
+		</File>
+		<File
 			RelativePath=".\clk_main.cpp">
 		</File>
 		<File

@@ -24,6 +24,7 @@ static void clk_main()
 	flext::post("-------------------------------");
 
 	// call the objects' setup routines
+	FLEXT_SETUP(Internal);
 	FLEXT_SETUP(Sync);
 	FLEXT_SETUP(Tap);
 	FLEXT_SETUP(Metro);
@@ -32,6 +33,9 @@ static void clk_main()
 
 // setup the library
 FLEXT_LIB_SETUP(clk,clk_main)
+
+
+Clocks Parent::clocks;
 
 #if 0
 

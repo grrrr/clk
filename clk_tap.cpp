@@ -12,10 +12,17 @@ namespace clk {
 
 class Tap
     : public flext_base
+    , public Master
 {
     FLEXT_HEADER(Tap,flext_base)
+
+public:
+    Tap(int argc,const t_atom *argv)
+        : Master(argc,argv)
+    {
+    }
 };
 
-FLEXT_LIB("clk.tap",Tap)
+FLEXT_LIB_V("clk.tap",Tap)
 
 } // namespace
