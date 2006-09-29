@@ -26,8 +26,6 @@ class Client;
 class Clock
 {
 public:
-    Clock(const t_symbol *n,Master *m = NULL): name(n),master(m) { reset(); }
-
 	void reset()
 	{
 		a = b = s = sx = sy = sxx = sxy = 0;
@@ -51,9 +49,11 @@ public:
     static Clock *Register(const t_symbol *n,Master *m);
     static void Unregister(Clock *clk,Master *m);
 
-protected:
+private:
 
     double a,b,s,sx,sy,sxx,sxy;
+
+    Clock(const t_symbol *n,Master *m = NULL): name(n),master(m) { reset(); }
 
     Master *master;
 
@@ -62,6 +62,8 @@ protected:
 
     typedef std::map<const t_symbol *,Clock *> Clocks;
     static Clocks clocks;
+
+    static void TryFree(Clock *clk);
 };
 
 

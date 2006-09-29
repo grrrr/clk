@@ -25,6 +25,15 @@ void Clock::set(double x,double y,float w)
 }
 
 
+void Clock::TryFree(Clock *clk)
+{
+    if(clk->clients.empty() && !clk->master) {
+        FLEXT_ASSERT(clocks.find(clk->name) != clocks.end());
+        clocks.erase(clk->name);
+        delete clk;
+    }
+}
+
 Clock *Clock::Register(const t_symbol *n,Client *c) 
 {
     FLEXT_ASSERT(c);
@@ -45,11 +54,7 @@ void Clock::Unregister(Clock *clk,Client *c)
 {
     FLEXT_ASSERT(clk->clients.find(c) != clk->clients.end());
     clk->clients.erase(c);
-    if(clk->clients.empty() && ! clk->master) {
-        FLEXT_ASSERT(clocks.find(clk->name) != clocks.end());
-        clocks.erase(clk->name);
-        delete clk;
-    }
+    TryFree(clk);
 }
 
 Clock *Clock::Register(const t_symbol *n,Master *m)
@@ -70,13 +75,9 @@ Clock *Clock::Register(const t_symbol *n,Master *m)
 
 void Clock::Unregister(Clock *clk,Master *m) 
 {
-    FLEXT_ASSERT(clk->master != m);
+    FLEXT_ASSERT(clk->master == m);
     clk->master = NULL;
-    if(clk->clients.empty()) {
-        FLEXT_ASSERT(clocks.find(clk->name) != clocks.end());
-        clocks.erase(clk->name);
-        delete clk;
-    }
+    TryFree(clk);
 }
 
 Clock::Clocks Clock::clocks;

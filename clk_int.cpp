@@ -6,27 +6,31 @@ For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
 
+#define FLEXT_ATTRIBUTES 1
+
 #include "clk.h"
 
 namespace clk {
 
-class Sync
+class Internal
     : public flext_base
     , public Master
 {
-    FLEXT_HEADER(Sync,flext_base)
+    FLEXT_HEADER_S(Internal,flext_base,Setup)
 
 public:
-    Sync(int argc,const t_atom *argv)
+    Internal(int argc,const t_atom *argv)
         : Master(argc,argv)
     {
     }
 
-	void m_set(double y) { settime(Time(),y); }
+protected:
 
-    void m_double(float a,float b)  { m_set((double)a+(double)b); }
+    static void Setup(t_classid c)
+    {
+    }
 };
 
-FLEXT_LIB_V("clk.sync",Sync)
+FLEXT_LIB_V("clk.int",Internal)
 
 } // namespace

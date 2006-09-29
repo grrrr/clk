@@ -1,0 +1,36 @@
+#N canvas 466 545 729 464 12;
+#X obj 485 55 clk.tap \$0-tap;
+#X obj 131 324 clk.metro;
+#X obj 317 328 clk.delay;
+#X obj 88 167 symbol \$0-int;
+#X obj 88 191 symbol \$0-sync;
+#X obj 88 215 symbol \$0-tap;
+#X obj 68 169 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 67 193 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 67 217 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 49 49 clk.int \$0-int;
+#X msg 95 274 getname;
+#X obj 181 360 print METRO;
+#X obj 363 362 print DELAY;
+#X obj 90 81 print INT;
+#X obj 539 86 print TAP;
+#X msg 173 272 name \$1;
+#X obj 257 53 clk.sync \$0-sync;
+#X obj 316 88 print SYNC;
+#X connect 0 0 14 0;
+#X connect 1 0 11 0;
+#X connect 2 0 12 0;
+#X connect 3 0 15 0;
+#X connect 4 0 15 0;
+#X connect 5 0 15 0;
+#X connect 6 0 3 0;
+#X connect 7 0 4 0;
+#X connect 8 0 5 0;
+#X connect 9 0 13 0;
+#X connect 10 0 1 0;
+#X connect 15 0 1 0;
+#X connect 15 0 2 0;
+#X connect 16 0 17 0;
