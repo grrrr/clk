@@ -6,33 +6,74 @@ For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
 
-#define FLEXT_ATTRIBUTES 1
-
-#include "clk.h"
+#include "clk_client.h"
 
 namespace clk {
 
 class Delay
-    : public flext_dsp
-    , public Client
+    : public ClientExt
 {
-    FLEXT_HEADER_S(Delay,flext_dsp,Setup)
+    FLEXT_HEADER_S(Delay,ClientExt,Setup)
 
 public:
     Delay(int argc,const t_atom *argv)
-        : Client(argc,argv)
+        : ClientExt(argc,argv)
     {
+		FLEXT_ADDTIMER(timer,CbTimer);
     }
+
+	void m_delay(double intv,double offs = 0) 
+	{ 
+		if(clock) {
+			double dur = intv/(clock->Factor()*factor);
+			double realdur;
+			if(t3mode) {
+				double dticks = (dur+offs)/ticks2s;
+				int iticks = (int)dticks;
+				tickoffs = (dticks-iticks)*ticks2s;
+				realdur = iticks*ticks2s;
+			}
+			else {
+				tickoffs = 0;
+				realdur = dur;
+			}
+			
+			reentered = false;
+
+			// schedule
+			if(!reentered) timer.Delay(realdur); 
+			
+			reentered = true;
+		} 
+	}
+
+	void m_delay2(float intv1,float intv2) { m_delay((double)intv1+(double)intv2); }
+	
+	void m_stop() { timer.Reset(); }
 
 protected:
 
-	FLEXT_CALLSET_S(ms_name)
-	FLEXT_CALLGET_S(mg_name)
+	void CbTimer(void *) 
+	{ 
+		m_get(tickoffs);  // ... re-entering might happen here!
+	}
+
+	FLEXT_CALLBACK_F(m_delay)
+	FLEXT_CALLBACK_FF(m_delay2)
+	FLEXT_CALLBACK(m_stop)
+
+	FLEXT_CALLBACK_T(CbTimer)
 
     static void Setup(t_classid c)
     {
-		FLEXT_CADDATTR_VAR(c,"name",mg_name,ms_name);
+		FLEXT_CADDMETHOD(c,0,m_delay);
+		FLEXT_CADDMETHOD_FF(c,0,sym_list,m_delay2);
+		FLEXT_CADDMETHOD_(c,0,"stop",m_stop);
     }
+
+	Timer timer;
+	double tickoffs;
+    bool reentered;
 };
 
 FLEXT_LIB_V("clk.delay",Delay)

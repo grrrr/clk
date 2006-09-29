@@ -9,6 +9,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #ifndef __CLK_H
 #define __CLK_H
 
+#define FLEXT_ATTRIBUTES 1
+
 #include <flext.h>
 #include <set>
 #include <map>
@@ -55,6 +57,8 @@ private:
 
     Clock(const t_symbol *n,Master *m = NULL): name(n),master(m) { reset(); }
 
+    ~Clock() { FLEXT_ASSERT(!master && clients.empty()); }
+
     Master *master;
 
     typedef std::set<Client *> Clients;
@@ -76,86 +80,9 @@ class ExcExisting: public exception { public: ExcExisting(): exception("Name alr
 class Parent
     : public flext
 {
-public:
-
 protected:
 
-};
-
-
-class Master
-	: public Parent
-{
-public:
-
-protected:
-    Master(int argc,const t_atom *argv)
-    {
-        if(argc != 1 || !IsSymbol(*argv))
-            throw ExcSyntax();
-
-        const t_symbol *name = GetSymbol(*argv);
-        clock = Clock::Register(name,this);
-
-        if(!clock) 
-            throw ExcExisting();
-    }
-
-    ~Master()
-    {
-        Clock::Unregister(clock,this);
-    }
-
-	void settime(double x,double y) { clock->set(x,y,weight); }
-
-	Clock *clock;
-
-	float weight;
-};
-
-
-class Client
-	: public Parent
-{
-protected:
-	Client(int argc,const t_atom *argv)
-    {
-		const t_symbol *n;
-		if(!argc)
-			n = NULL;
-		else if(argc == 1 && IsSymbol(argv[0]))
-			n = GetSymbol(argv[0]);
-		else 
-            throw ExcSyntax();
-
-		ms_name(n);
-    }
-
-    ~Client()
-    {
-		ms_name(NULL);
-    }
-
-	void ms_name(const t_symbol *n)
-	{
-        if(clock) {
-            if(clock->name == n) return;
-
-            Clock::Unregister(clock,this);
-            clock = NULL;
-        }
-        else if(!n || n == sym__)
-            return;
-
-		if(n) {
-            clock = Clock::Register(n,this);
-		}
-	}
-
-	void mg_name(const t_symbol *&n) { n = clock?clock->name:sym__; }
-
-
-	double current() const { return (clock->current()+offset)*factor; }
+    Parent(): clock(NULL) {}
 
 	static t_atom *mkdbl(t_atom *dbl,double d)
 	{
@@ -165,12 +92,10 @@ protected:
 		return dbl;
 	}
 
-    Clock *clock;
-	Timer timer;
+	void mg_timebase(float &t) const { if(clock) { float f = (float)clock->Factor(); t = f?1.f/f:0; } else t = 0; }
 
-	double offset,factor;
+	Clock *clock;
 };
-
 
 } // namespace
 

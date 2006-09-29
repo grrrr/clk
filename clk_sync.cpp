@@ -6,21 +6,18 @@ For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
 
-#define FLEXT_ATTRIBUTES 1
-
-#include "clk.h"
+#include "clk_master.h"
 
 namespace clk {
 
 class Sync
-    : public flext_base
-    , public Master
+    : public MasterExt
 {
-    FLEXT_HEADER_S(Sync,flext_base,Setup)
+    FLEXT_HEADER_S(Sync,MasterExt,Setup)
 
 public:
     Sync(int argc,const t_atom *argv)
-        : Master(argc,argv)
+        : MasterExt(argc,argv)
     {
     }
 
@@ -29,6 +26,7 @@ public:
     void m_double(float a,float b)  { m_set((double)a+(double)b); }
 
 protected:
+    FLEXT_CALLBACK(m_reset)
 	FLEXT_CALLBACK_F(m_set)
 	FLEXT_CALLBACK_FF(m_double)
 
@@ -36,6 +34,7 @@ protected:
 
     static void Setup(t_classid c)
     {
+		FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
 		FLEXT_CADDMETHOD(c,0,m_set);
 
         FLEXT_CADDMETHOD_FF(c,0,sym_list,m_double);

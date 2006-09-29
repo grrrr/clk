@@ -118,6 +118,9 @@
 			RelativePath=".\clk.h">
 		</File>
 		<File
+			RelativePath=".\clk_client.h">
+		</File>
+		<File
 			RelativePath=".\clk_clock.cpp">
 		</File>
 		<File
@@ -130,6 +133,9 @@
 			RelativePath=".\clk_main.cpp">
 		</File>
 		<File
+			RelativePath=".\clk_master.h">
+		</File>
+		<File
 			RelativePath=".\clk_metro.cpp">
 		</File>
 		<File
@@ -137,6 +143,9 @@
 		</File>
 		<File
 			RelativePath=".\clk_tap.cpp">
+		</File>
+		<File
+			RelativePath=".\clk_time.cpp">
 		</File>
 	</Files>
 	<Globals>

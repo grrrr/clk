@@ -6,22 +6,21 @@ For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
 
-#define FLEXT_ATTRIBUTES 1
-
-#include "clk.h"
+#include "clk_master.h"
 
 namespace clk {
 
 class Internal
-    : public flext_base
-    , public Master
+    : public MasterExt
 {
-    FLEXT_HEADER_S(Internal,flext_base,Setup)
+    FLEXT_HEADER_S(Internal,MasterExt,Setup)
 
 public:
     Internal(int argc,const t_atom *argv)
-        : Master(argc,argv)
+        : MasterExt(argc,argv)
     {
+		clock->set(0,0,0.5);
+		clock->set(1,1000,0.5);
     }
 
 protected:
