@@ -35,8 +35,6 @@ static void clk_main()
 FLEXT_LIB_SETUP(clk,clk_main)
 
 
-Clocks Parent::clocks;
-
 #if 0
 
 /*! 

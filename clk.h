@@ -22,31 +22,18 @@ inline double Time() { return flext::GetTime(); }
 class Master;
 class Client;
 
-typedef std::set<Client *> Clients;
 
 class Clock
 {
 public:
-    Clock(const t_symbol *n): name(n),master(NULL) { reset(); }
+    Clock(const t_symbol *n,Master *m = NULL): name(n),master(m) { reset(); }
 
 	void reset()
 	{
 		a = b = s = sx = sy = sxx = sxy = 0;
 	}
 
-	void set(double x,double y,float w) 
-    { 
-		float iw = 1.f-w;
-		s = s*iw+w;
-		sx = sx*iw+x*w;
-		sy = sy*iw+y*w;
-		sxx = sxx*iw+x*x*w;
-		sxy = sxy*iw+x*y*w;
-
-		double d = s*sxx-sx*sx;
-		a = (sxx*sy-sx*sxy)/d;
-		b = (s*sxy-sx*sy)/d;
-    }
+	void set(double x,double y,float weight);
 
 	double get(double x) const { return a+b*x; } 
 
@@ -57,21 +44,26 @@ public:
 
     const t_symbol *const name;
 
-    void Unregister(Client *c) 
-    {
-        clients.erase(c);
-    }
+
+    static Clock *Register(const t_symbol *n,Client *c);
+    static void Unregister(Clock *clk,Client *c);
+
+    static Clock *Register(const t_symbol *n,Master *m);
+    static void Unregister(Clock *clk,Master *m);
 
 protected:
 
+    double a,b,s,sx,sy,sxx,sxy;
+
     Master *master;
+
+    typedef std::set<Client *> Clients;
     Clients clients;
 
-    double a,b,s,sx,sy,sxx,sxy;
+    typedef std::map<const t_symbol *,Clock *> Clocks;
+    static Clocks clocks;
 };
 
-
-typedef std::map<const t_symbol *,Clock *> Clocks;
 
 
 
@@ -86,7 +78,6 @@ public:
 
 protected:
 
-    static Clocks clocks;
 };
 
 
@@ -102,13 +93,15 @@ protected:
             throw ExcSyntax();
 
         const t_symbol *name = GetSymbol(*argv);
+        clock = Clock::Register(name,this);
 
-        //////////////////////////////////////////////
+        if(!clock) 
+            throw ExcExisting();
     }
 
     ~Master()
     {
-        /////////////////////////////////////////////
+        Clock::Unregister(clock,this);
     }
 
 	void settime(double x,double y) { clock->set(x,y,weight); }
@@ -146,14 +139,14 @@ protected:
         if(clock) {
             if(clock->name == n) return;
 
-            clock->Unregister(this);
+            Clock::Unregister(clock,this);
             clock = NULL;
         }
         else if(!n || n == sym__)
             return;
 
 		if(n) {
-            //////////////////////////////////////
+            clock = Clock::Register(n,this);
 		}
 	}
 

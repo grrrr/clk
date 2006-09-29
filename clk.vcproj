@@ -118,6 +118,9 @@
 			RelativePath=".\clk.h">
 		</File>
 		<File
+			RelativePath=".\clk_clock.cpp">
+		</File>
+		<File
 			RelativePath=".\clk_delay.cpp">
 		</File>
 		<File
