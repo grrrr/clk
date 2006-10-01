@@ -21,9 +21,9 @@ public:
     {
     }
 
-	void m_set(double y) { settime(Time(),y); }
+	void m_set(double y) { setcurrent(y); }
 
-    void m_double(float a,float b)  { m_set((double)a+(double)b); }
+    void m_double(float a,float b)  { setcurrent((double)a+(double)b); }
 
 protected:
     FLEXT_CALLBACK(m_reset)
@@ -35,6 +35,7 @@ protected:
     static void Setup(t_classid c)
     {
 		FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
+
 		FLEXT_CADDMETHOD(c,0,m_set);
 
         FLEXT_CADDMETHOD_FF(c,0,sym_list,m_double);

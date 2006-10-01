@@ -24,7 +24,7 @@ public:
 
     virtual void m_reset() { thisParent::m_reset(); taps = 0; }
 	
-	void m_tap() { settime(Time(),taps++); }
+	void m_tap() { setcurrent(taps++); }
 
 protected:
     FLEXT_CALLBACK(m_reset)

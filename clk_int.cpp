@@ -13,20 +13,14 @@ namespace clk {
 class Internal
     : public MasterExt
 {
-    FLEXT_HEADER_S(Internal,MasterExt,Setup)
+    FLEXT_HEADER(Internal,MasterExt)
 
 public:
     Internal(int argc,const t_atom *argv)
         : MasterExt(argc,argv)
     {
-		clock->set(0,0,0.5);
-		clock->set(1,1000,0.5);
-    }
-
-protected:
-
-    static void Setup(t_classid c)
-    {
+		settime(0,0);
+		settime(1,1000);
     }
 };
 

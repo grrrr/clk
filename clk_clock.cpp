@@ -6,24 +6,38 @@ For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
 
-#include "clk.h"
+#include "clk_client.h"
 
 namespace clk {
 
-void Clock::set(double x,double y,float w)
+void Clock::Set(double x,double y,float w,bool pre)
 { 
-	float iw = 1.f-w;
-	s = s*iw+w;
-	sx = sx*iw+x*w;
-	sy = sy*iw+y*w;
-	sxx = sxx*iw+x*x*w;
-	sxy = sxy*iw+x*y*w;
+    if(pre) {
+        n = -1;
+        prex = x,prey = y;
+        prew = w;
+    }
+    else {
+        double t = Time();
+        double cold = Get(t);
 
-	double d = s*sxx-sx*sx;
-	a = (sxx*sy-sx*sxy)/d;
-	b = (s*sxy-sx*sy)/d;
+        if(n < 0) {
+            reset();
+            add(prex,prey,prew);
+        }
+        add(x,y,w);
+
+        double cnew = Get(t);
+
+        Update(cold,cnew);
+    }
 }
 
+void Clock::Update(double told,double tnew)
+{
+    for(Clients::iterator it = clients.begin(); it != clients.end(); ++it)
+        (*it)->Update(told,tnew);
+}
 
 void Clock::TryFree(Clock *clk)
 {

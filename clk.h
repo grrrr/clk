@@ -28,16 +28,11 @@ class Client;
 class Clock
 {
 public:
-	void reset()
-	{
-		a = b = s = sx = sy = sxx = sxy = 0;
-	}
+	void Set(double x,double y,float weight,bool pre = false);
 
-	void set(double x,double y,float weight);
+    double Get(double x) const { return a+b*x; } 
 
-	double get(double x) const { return a+b*x; } 
-
-	double current() const { return get(Time()); }
+	double Current() const { return Get(Time()); }
 
 	double Offset() const { return a; }
 	double Factor() const { return b; }
@@ -53,11 +48,45 @@ public:
 
 private:
 
+    int n;
     double a,b,s,sx,sy,sxx,sxy;
+    double prex,prey;
+    float prew;
 
-    Clock(const t_symbol *n,Master *m = NULL): name(n),master(m) { reset(); }
+    Clock(const t_symbol *n,Master *m = NULL)
+        : name(n),master(m) 
+    { 
+        reset(); 
+    }
 
-    ~Clock() { FLEXT_ASSERT(!master && clients.empty()); }
+    ~Clock() 
+    { 
+        FLEXT_ASSERT(!master);
+        FLEXT_ASSERT(clients.empty()); 
+    }
+
+    void Update(double told,double tnew);
+
+	void reset()
+	{
+        n = 0;
+		a = b = s = sx = sy = sxx = sxy = 0;
+	}
+
+    void add(double x,double y,float w)
+    { 
+	    float iw = 1.f-w;
+	    s = s*iw+w;
+	    sx = sx*iw+x*w;
+	    sy = sy*iw+y*w;
+	    sxx = sxx*iw+x*x*w;
+	    sxy = sxy*iw+x*y*w;
+        ++n;
+
+	    double d = s*sxx-sx*sx;
+	    a = (sxx*sy-sx*sxy)/d;
+	    b = (s*sxy-sx*sy)/d;
+    }
 
     Master *master;
 
@@ -92,7 +121,15 @@ protected:
 		return dbl;
 	}
 
-	void mg_timebase(float &t) const { if(clock) { float f = (float)clock->Factor(); t = f?1.f/f:0; } else t = 0; }
+	void mg_timebase(float &t) const 
+    { 
+        if(clock) { 
+            float f = (float)clock->Factor(); 
+            t = f?1.f/f:0; 
+        } 
+        else 
+            t = 0; 
+    }
 
 	Clock *clock;
 };

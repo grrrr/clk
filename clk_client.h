@@ -16,48 +16,21 @@ namespace clk {
 class Client
 	: public Parent
 {
+    friend class Clock;
+
 protected:
-	Client(int argc,const t_atom *argv)
-        : offset(0),factor(1)
-    {
-		const t_symbol *n;
-		if(!argc)
-			n = NULL;
-		else if(argc == 1 && IsSymbol(argv[0]))
-			n = GetSymbol(argv[0]);
-		else 
-            throw ExcSyntax();
+	Client(int argc,const t_atom *argv);
+    ~Client();
 
-		ms_name(n);
-    }
+    virtual void Update(double told,double tnew);
 
-    ~Client()
-    {
-		ms_name(NULL);
-    }
-
-	void ms_name(const t_symbol *n)
-	{
-        if(clock) {
-            if(clock->name == n) return;
-
-            Clock::Unregister(clock,this);
-            clock = NULL;
-        }
-        else if(!n || n == sym__)
-            return;
-
-		if(n) {
-            clock = Clock::Register(n,this);
-            m_reset();
-		}
-	}
+    void ms_name(const t_symbol *n);
 
 	void mg_name(const t_symbol *&n) { n = clock?clock->name:sym__; }
 
-	void m_reset() { offset = clock?-clock->current():0; } 
+	void m_reset() { offset = clock?-clock->Current():0; } 
 
-	double current(double offs = 0) const { return (clock->get(Time()+offs)+offset)*factor; }
+	double current(double offs = 0) const { return (clock->Get(Time()+offs)+offset)*factor; }
 
 	Timer timer;
 
@@ -71,30 +44,9 @@ class ClientExt
     FLEXT_HEADER_S(ClientExt,flext_dsp,Setup)
 
 public:
-    ClientExt(int argc,const t_atom *argv)
-        : Client(argc,argv)
-        , dblprec(false)
-        , t3mode(false)
-    {
-        AddInSignal();
-		AddOutAnything(); // for sync'd timebase
-		AddOutAnything(); // for logical time and correction
+    ClientExt(int argc,const t_atom *argv);
 
-		setcnv();
-    }
-
-	void m_get(double offs = 0) 
-	{ 
-        if(!clock) return;
-
-		ToSysFloat(1,(float)(offs*1000.));
-		if(dblprec) {
-			t_atom dbl[2];
-			ToSysList(0,2,mkdbl(dbl,current(offs)));
-		}
-		else
-			ToSysFloat(0,(float)current(offs)); 
-	} 
+	void m_get(double offs = 0);
 
 	void ms_factor(float f) 
 	{ 
@@ -107,7 +59,7 @@ public:
 
 protected:
 
-	virtual bool CbDsp() { setcnv(); return false; }
+	virtual bool CbDsp();
 
 	void setcnv() { ticks2s = (double)Blocksize()/(double)Samplerate(); }
 
@@ -126,20 +78,7 @@ protected:
 	FLEXT_ATTRVAR_B(dblprec)
 	FLEXT_ATTRVAR_B(t3mode)
 
-    static void Setup(t_classid c)
-    {
-		FLEXT_CADDATTR_VAR(c,"name",mg_name,ms_name);
-
-		FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
-
-		FLEXT_CADDATTR_VAR1(c,"offset",offset);
-		FLEXT_CADDATTR_VAR(c,"factor",factor,ms_factor);
-
-		FLEXT_CADDATTR_GET(c,"timebase",mg_timebase);
-
-		FLEXT_CADDATTR_VAR1(c,"dblprec",dblprec);
-		FLEXT_CADDATTR_VAR1(c,"t3mode",t3mode);
-    }
+    static void Setup(t_classid c);
 
 	bool dblprec;
     bool t3mode;

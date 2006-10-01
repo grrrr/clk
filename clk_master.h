@@ -16,31 +16,27 @@ namespace clk {
 class Master
 	: public Parent
 {
-public:
+    friend class Clock;
 
 protected:
-    Master(int argc,const t_atom *argv)
-        : weight(0.5)
-    {
-        if(argc != 1 || !IsSymbol(*argv))
-            throw ExcSyntax();
+    Master(int argc,const t_atom *argv);
+    ~Master();
 
-        const t_symbol *name = GetSymbol(*argv);
-        clock = Clock::Register(name,this);
-
-        if(!clock) 
-            throw ExcExisting();
+    void reset() 
+    { 
+        pre = true;
     }
 
-    ~Master()
-    {
-        Clock::Unregister(clock,this);
+	void settime(double x,double y) 
+    { 
+        if(clock)
+            clock->Set(x,y,weight,pre); 
+        pre = false;
     }
 
-    void reset() { if(clock) clock->reset(); }
+    void setcurrent(double y) { settime(Time(),y); }
 
-	void settime(double x,double y) { if(clock) clock->set(x,y,weight); }
-
+    bool pre;
 	float weight;
 };
 
@@ -52,24 +48,17 @@ class MasterExt
     FLEXT_HEADER_S(MasterExt,flext_base,Setup)
 
 public:
-    MasterExt(int argc,const t_atom *argv)
-        : Master(argc,argv)
-    {
-        AddInAnything();
-    }
+    MasterExt(int argc,const t_atom *argv);
 
-	virtual void m_reset() { reset(); }
+	virtual void m_reset();
 	
 protected:
 
-	double current() const { return clock->current(); }
+	double current() const { return clock->Current(); }
 
 	FLEXT_CALLGET_F(mg_timebase)
 
-    static void Setup(t_classid c)
-    {
-		FLEXT_CADDATTR_GET(c,"timebase",mg_timebase);
-    }
+    static void Setup(t_classid c);
 };
 
 } // namespace
