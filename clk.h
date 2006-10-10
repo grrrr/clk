@@ -102,8 +102,8 @@ private:
 
 
 
-class ExcSyntax: public exception { public: ExcSyntax(): exception("Syntax error") {} };
-class ExcExisting: public exception { public: ExcExisting(): exception("Name already existing") {} };
+class ExcSyntax: public std::exception { };
+class ExcExisting: public std::exception { };
 
 
 class Parent
