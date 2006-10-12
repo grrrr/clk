@@ -30,7 +30,7 @@ protected:
 
 	void m_reset() { offset = clock?-clock->Current():0; } 
 
-	double current(double offs = 0) const { return (clock->Get(Time()+offs)+offset)*factor; }
+	double Current(double offs = 0) const { return (clock->Get(Time()+offs)+offset)*factor; }
 
 	Timer timer;
 

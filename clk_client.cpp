@@ -66,10 +66,10 @@ void ClientExt::m_get(double offs)
 	ToSysFloat(1,(float)(offs*1000.));
 	if(dblprec) {
 		t_atom dbl[2];
-		ToSysList(0,2,mkdbl(dbl,current(offs)));
+		ToSysList(0,2,mkdbl(dbl,Current(offs)));
 	}
 	else
-		ToSysFloat(0,(float)current(offs)); 
+		ToSysFloat(0,(float)Current(offs)); 
 } 
 
 bool ClientExt::CbDsp() { setcnv(); return false; }

@@ -18,45 +18,74 @@ class Delay
 public:
     Delay(int argc,const t_atom *argv)
         : ClientExt(argc,argv)
+        , scheduled(-1)
     {
 		FLEXT_ADDTIMER(timer,CbTimer);
     }
 
 	void m_delay(double intv,double offs = 0) 
 	{ 
-		if(clock) {
-			double dur = intv/(clock->Factor()*factor);
-			double realdur;
-			if(t3mode) {
-				double dticks = (dur+offs)/ticks2s;
-				int iticks = (int)dticks;
-				tickoffs = (dticks-iticks)*ticks2s;
-				realdur = iticks*ticks2s;
-			}
-			else {
-				tickoffs = 0;
-				realdur = dur;
-			}
-			
-			// schedule
-			timer.Delay(realdur); 
-		} 
+        if(LIKELY(clock)) {
+            double dur = intv/(clock->Factor()*factor);
+
+		    if(t3mode) {
+			    double dticks = (dur+offs)/ticks2s;
+			    int iticks = (int)dticks;
+			    tickoffs = (dticks-iticks)*ticks2s;
+			    dur = iticks*ticks2s;
+		    }
+		    else
+                tickoffs = 0;
+    		
+		    // schedule
+		    timer.Delay(dur); 
+
+            double cur = Current();
+            scheduled = cur+intv;
+//            post("%lf: Scheduled for +%lf = %lf",cur,dur,scheduled);
+        }
 	}
 
 	void m_delay2(float intv1,float intv2) { m_delay((double)intv1+(double)intv2); }
 	
-	void m_stop() { timer.Reset(); }
+	void m_stop() 
+    { 
+        timer.Reset();
+        scheduled = -1;
+    }
 
 protected:
 
     virtual void Update(double told,double tnew)
     {
-        // TODO: correct eventuelly running delay
+        FLEXT_ASSERT(clock);
+
+        if(scheduled < 0) return; // clock not set
+
+        double time = (tnew+offset)*factor;
+        double still = scheduled-time;
+
+//        post("%lf: time=%lf",Current(),time);
+
+        if(UNLIKELY(still < 0)) {
+//            post("Missed!");
+
+            // we missed the time already... output immediately!
+            m_stop();
+            m_get();
+        }
+        else {
+//            post("Reschedule in %lf!",still);
+
+            // schedule new delay
+            m_delay(still);
+        }
     }
 
 	void CbTimer(void *) 
 	{ 
 		m_get(tickoffs);
+        scheduled = -1;
 	}
 
 	FLEXT_CALLBACK_F(m_delay)
@@ -73,7 +102,7 @@ protected:
     }
 
 	Timer timer;
-	double tickoffs;
+	double scheduled,tickoffs;
 };
 
 FLEXT_LIB_V("clk.delay",Delay)

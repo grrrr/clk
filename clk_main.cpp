@@ -8,20 +8,20 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "clk.h"
 
-#define CLK_VERSION "0.1.2"
+#define CLK_VERSION "0.1.3"
 
 namespace clk {
 
 static void clk_main()
 {
-	flext::post("-------------------------------");
+	flext::post("----------------------------------");
 	flext::post("clk - syncable clocking objects");
     flext::post("version " CLK_VERSION " (c)2006 Thomas Grill");
 #ifdef FLEXT_DEBUG
     flext::post("");
     flext::post("DEBUG BUILD - " __DATE__ " " __TIME__);
 #endif
-	flext::post("-------------------------------");
+	flext::post("----------------------------------");
 
 	// call the objects' setup routines
 	FLEXT_SETUP(Internal);

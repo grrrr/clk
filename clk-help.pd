@@ -1,4 +1,4 @@
-#N canvas 121 163 1125 520 12;
+#N canvas 121 163 1149 544 12;
 #X obj 852 154 clk.tap \$0-tap;
 #X obj 180 190 symbol \$0-int;
 #X obj 180 214 symbol \$0-sync;
@@ -25,7 +25,7 @@
 #X obj 26 255 bng 25 250 50 0 empty empty get_time 0 -6 0 8 -258699
 -1 -1;
 #X obj 795 45 metro 700;
-#X obj 795 30 tgl 15 0 empty empty empty 0 -6 0 8 -260818 -1 -1 0 1
+#X obj 795 30 tgl 15 0 empty empty empty 0 -6 0 8 -260818 -1 -1 1 1
 ;
 #X floatatom 223 435 5 0 0 0 - - -;
 #X floatatom 150 464 8 0 0 0 - - -;
@@ -83,7 +83,7 @@
 1;
 #X msg 25 298 0.13;
 #X text 62 300 t3 offset;
-#X obj 26 176 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
+#X obj 26 176 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
 #X obj 795 80 bng 50 250 50 0 empty empty tap 0 -6 0 8 -260818 -1 -1
 ;
@@ -91,7 +91,7 @@
 #X floatatom 50 174 5 0 0 0 - - -;
 #X obj 159 444 unpack;
 #X floatatom 218 464 8 0 0 0 - - -;
-#X obj 134 466 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 133 465 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X floatatom 460 459 8 0 0 0 - - -;
 #X obj 469 439 unpack;
