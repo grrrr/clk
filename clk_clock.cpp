@@ -29,14 +29,11 @@ void Clock::Set(double x,double y,float w,bool pre)
 
         double cnew = Get(t);
 
-        Update(cold,cnew);
+        if(fabs(cnew-cold) >= precision) {
+            for(Clients::iterator it = clients.begin(); it != clients.end(); ++it)
+                (*it)->Update(cold,cnew);
+        }
     }
-}
-
-void Clock::Update(double told,double tnew)
-{
-    for(Clients::iterator it = clients.begin(); it != clients.end(); ++it)
-        (*it)->Update(told,tnew);
 }
 
 void Clock::TryFree(Clock *clk)

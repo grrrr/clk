@@ -37,6 +37,9 @@ public:
 	double Offset() const { return a; }
 	double Factor() const { return b; }
 
+    float Precision() const { return precision; }
+    void Precision(float f) { precision = f; }
+
     const t_symbol *const name;
 
 
@@ -54,7 +57,8 @@ private:
     float prew;
 
     Clock(const t_symbol *n,Master *m = NULL)
-        : name(n),master(m) 
+        : name(n),master(m)
+        , precision(1.e-10f)
     { 
         reset(); 
     }
@@ -64,8 +68,6 @@ private:
         FLEXT_ASSERT(!master);
         FLEXT_ASSERT(clients.empty()); 
     }
-
-    void Update(double told,double tnew);
 
 	void reset()
 	{
@@ -89,6 +91,7 @@ private:
     }
 
     Master *master;
+    float precision;
 
     typedef std::set<Client *> Clients;
     Clients clients;
@@ -129,6 +132,16 @@ protected:
         } 
         else 
             t = 0; 
+    }
+
+	void mg_precision(float &p) const 
+    { 
+        p = clock?clock->Precision():0;
+    }
+
+	void ms_precision(float p)
+    {
+        if(clock) clock->Precision(p);
     }
 
 	Clock *clock;

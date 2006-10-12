@@ -44,6 +44,7 @@ void MasterExt::m_reset()
 void MasterExt::Setup(t_classid c)
 {
 	FLEXT_CADDATTR_GET(c,"timebase",mg_timebase);
+	FLEXT_CADDATTR_VAR(c,"precision",mg_precision,ms_precision);
 }
 
 } // namespace

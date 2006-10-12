@@ -58,6 +58,8 @@ protected:
 
 	FLEXT_CALLGET_F(mg_timebase)
 
+	FLEXT_CALLVAR_F(mg_precision,ms_precision)
+
     static void Setup(t_classid c);
 };
 
