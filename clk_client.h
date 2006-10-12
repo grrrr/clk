@@ -22,7 +22,7 @@ protected:
 	Client(int argc,const t_atom *argv);
     ~Client();
 
-    virtual void Update(double told,double tnew);
+    virtual void Update(double told,double tnew) = 0;
 
     void ms_name(const t_symbol *n);
 

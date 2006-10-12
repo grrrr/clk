@@ -51,7 +51,7 @@ protected:
 
     virtual void Update(double told,double tnew)
     {
-        thisParent::Update(told,tnew);
+        // TODO: correct eventuelly running delay
     }
 
 	void CbTimer(void *) 

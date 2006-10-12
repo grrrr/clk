@@ -29,12 +29,6 @@ Client::~Client()
 	ms_name(NULL);
 }
 
-void Client::Update(double told,double tnew) 
-{
-    // correct clock offset
-//    offset += told-tnew;
-}
-
 void Client::ms_name(const t_symbol *n)
 {
     if(clock) {

@@ -56,6 +56,11 @@ public:
 
 protected:
 
+    virtual void Update(double told,double tnew)
+    {
+        // TODO: correct eventuelly running metro
+    }
+
 	void CbTimer(void *) 
 	{ 
 		reentered = false;
