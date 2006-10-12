@@ -8,7 +8,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "clk.h"
 
-#define CLK_VERSION "0.1.1"
+#define CLK_VERSION "0.1.2"
 
 namespace clk {
 

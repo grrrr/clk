@@ -32,7 +32,7 @@ Client::~Client()
 void Client::Update(double told,double tnew) 
 {
     // correct clock offset
-    offset += told-tnew;
+//    offset += told-tnew;
 }
 
 void Client::ms_name(const t_symbol *n)

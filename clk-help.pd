@@ -1,4 +1,4 @@
-#N canvas 121 163 1121 516 12;
+#N canvas 121 163 1125 520 12;
 #X obj 852 154 clk.tap \$0-tap;
 #X obj 180 190 symbol \$0-int;
 #X obj 180 214 symbol \$0-sync;
@@ -10,25 +10,25 @@
 #X obj 159 240 bng 15 250 50 0 empty empty empty 0 -6 0 8 -241291 -1
 -1;
 #X obj 65 49 clk.int \$0-int;
-#X msg 161 337 getname;
+#X msg 185 335 getname;
 #X obj 588 427 print DELAY;
 #X obj 106 81 print INT;
 #X obj 906 185 print TAP;
-#X msg 161 310 name \$1;
+#X msg 185 308 name \$1;
 #X obj 444 134 clk.sync \$0-sync;
 #X obj 503 169 print SYNC;
-#X obj 113 391 clk.time;
+#X obj 159 396 clk.time;
 #X obj 938 427 print METRO;
 #X obj 814 385 clk.metro \$0-tap;
 #X obj 469 393 clk.delay \$0-sync;
-#X obj 225 427 print TIME;
+#X obj 271 432 print TIME;
 #X obj 26 255 bng 25 250 50 0 empty empty get_time 0 -6 0 8 -258699
 -1 -1;
 #X obj 795 45 metro 700;
 #X obj 795 30 tgl 15 0 empty empty empty 0 -6 0 8 -260818 -1 -1 0 1
 ;
-#X floatatom 177 430 5 0 0 0 - - -;
-#X floatatom 104 459 8 0 0 0 - - -;
+#X floatatom 223 435 5 0 0 0 - - -;
+#X floatatom 150 464 8 0 0 0 - - -;
 #X obj 383 45 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
 #N canvas 0 0 458 177 inc 0;
@@ -59,7 +59,7 @@
 #X msg 806 332 10;
 #X msg 563 34 reset;
 #X msg 959 50 reset;
-#X msg 25 367 reset;
+#X msg 24 344 reset;
 #X msg 458 311 reset;
 #X msg 807 302 reset;
 #X obj 298 52 loadbang;
@@ -75,11 +75,11 @@
 1;
 #X obj 913 333 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X msg 271 316 t3mode \$1;
-#X msg 270 347 dblprec \$1;
-#X obj 254 319 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X msg 295 314 t3mode \$1;
+#X msg 294 345 dblprec \$1;
+#X obj 278 317 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X obj 253 350 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X obj 277 348 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X msg 25 298 0.13;
 #X text 62 300 t3 offset;
@@ -89,10 +89,9 @@
 ;
 #X obj 26 191 metro 10;
 #X floatatom 50 174 5 0 0 0 - - -;
-#X text 24 350 reset offset;
-#X obj 113 439 unpack;
-#X floatatom 172 459 8 0 0 0 - - -;
-#X obj 87 460 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 159 444 unpack;
+#X floatatom 218 464 8 0 0 0 - - -;
+#X obj 134 466 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X floatatom 460 459 8 0 0 0 - - -;
 #X obj 469 439 unpack;
@@ -106,6 +105,9 @@
 -1;
 #X obj 563 59 t b a;
 #X text 161 166 choose a clock master;
+#X msg 24 398 offset 0;
+#X text 23 326 set origin to now;
+#X text 23 379 reset to source;
 #X connect 0 0 11 0;
 #X connect 1 0 12 0;
 #X connect 2 0 12 0;
@@ -117,13 +119,13 @@
 #X connect 8 0 15 0;
 #X connect 12 0 15 0;
 #X connect 13 0 14 0;
-#X connect 15 0 62 0;
+#X connect 15 0 61 0;
 #X connect 15 1 23 0;
 #X connect 15 2 19 0;
-#X connect 17 0 70 0;
+#X connect 17 0 69 0;
 #X connect 17 1 32 0;
 #X connect 17 2 16 0;
-#X connect 18 0 66 0;
+#X connect 18 0 65 0;
 #X connect 18 1 31 0;
 #X connect 18 2 9 0;
 #X connect 20 0 15 0;
@@ -139,7 +141,7 @@
 #X connect 34 0 18 0;
 #X connect 35 0 17 0;
 #X connect 36 0 17 0;
-#X connect 37 0 73 0;
+#X connect 37 0 72 0;
 #X connect 38 0 0 0;
 #X connect 39 0 15 0;
 #X connect 40 0 18 0;
@@ -162,14 +164,15 @@
 #X connect 58 0 0 0;
 #X connect 59 0 20 0;
 #X connect 60 0 59 1;
-#X connect 62 0 24 0;
-#X connect 62 0 64 0;
-#X connect 62 1 63 0;
-#X connect 66 0 65 0;
-#X connect 66 0 68 0;
-#X connect 66 1 67 0;
-#X connect 70 0 69 0;
-#X connect 70 0 72 0;
-#X connect 70 1 71 0;
-#X connect 73 0 26 1;
-#X connect 73 1 13 0;
+#X connect 61 0 24 0;
+#X connect 61 0 63 0;
+#X connect 61 1 62 0;
+#X connect 65 0 64 0;
+#X connect 65 0 67 0;
+#X connect 65 1 66 0;
+#X connect 69 0 68 0;
+#X connect 69 0 71 0;
+#X connect 69 1 70 0;
+#X connect 72 0 26 1;
+#X connect 72 1 13 0;
+#X connect 74 0 15 0;

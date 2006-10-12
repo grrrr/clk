@@ -38,12 +38,8 @@ public:
 				realdur = dur;
 			}
 			
-			reentered = false;
-
 			// schedule
-			if(!reentered) timer.Delay(realdur); 
-			
-			reentered = true;
+			timer.Delay(realdur); 
 		} 
 	}
 
@@ -53,9 +49,14 @@ public:
 
 protected:
 
+    virtual void Update(double told,double tnew)
+    {
+        thisParent::Update(told,tnew);
+    }
+
 	void CbTimer(void *) 
 	{ 
-		m_get(tickoffs);  // ... re-entering might happen here!
+		m_get(tickoffs);
 	}
 
 	FLEXT_CALLBACK_F(m_delay)
@@ -73,7 +74,6 @@ protected:
 
 	Timer timer;
 	double tickoffs;
-    bool reentered;
 };
 
 FLEXT_LIB_V("clk.delay",Delay)
