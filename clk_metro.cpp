@@ -47,13 +47,14 @@ protected:
 
         if(scheduled < 0) return; // clock not set
 
-        double time = (tnew+offset)*factor;
+        double time = Convert(tnew);
         double still = scheduled-time;
 
 //        post("%lf: time=%lf",Current(),time);
 
         while(UNLIKELY(still < 0)) {
-//            post("Missed!");
+            ToOutAnything(GetOutAttr(),sym_missed,0,NULL);
+
             // we missed the time already... output immediately!
             m_get();
             still += perintv;
@@ -80,7 +81,7 @@ protected:
         // After this block has been executed "reentered" is true, so we won't execute it again upon return from recursion
 
 		if(LIKELY(!reentered)) {
-			double dur = intv/(clock->Factor()*factor);
+			double dur = intv/(clock->Factor()*Factor());
 			// reschedule
 			if(t3mode) {
 				double dticks = (dur+tickoffs)/ticks2s;
@@ -108,6 +109,8 @@ protected:
 
     static void Setup(t_classid c)
     {
+        sym_missed = MakeSymbol("missed");
+
 		FLEXT_CADDMETHOD(c,0,m_metro);
 		FLEXT_CADDMETHOD_FF(c,0,sym_list,m_metro2);
 		FLEXT_CADDMETHOD_(c,0,"stop",m_stop);
@@ -116,7 +119,11 @@ protected:
 	Timer timer;
 	double scheduled,perintv,tickoffs;
     bool reentered;
+
+    static const t_symbol *sym_missed;
 };
+
+const t_symbol *Metro::sym_missed;
 
 FLEXT_LIB_V("clk.metro",Metro)
 

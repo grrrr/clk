@@ -7,6 +7,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 */
 
 #include "clk_master.h"
+#include "clk_client.h"
 
 namespace clk {
 
@@ -14,13 +15,13 @@ Master::Master(int argc,const t_atom *argv)
     : weight(0.5)
     , pre(true)
 {
-    if(argc != 1 || !IsSymbol(*argv))
+    if(UNLIKELY(argc != 1 || !IsSymbol(*argv)))
         throw ExcSyntax();
 
     const t_symbol *name = GetSymbol(*argv);
     clock = Clock::Register(name,this);
 
-    if(!clock) 
+    if(UNLIKELY(!clock)) 
         throw ExcExisting();
 }
 
@@ -38,14 +39,31 @@ MasterExt::MasterExt(int argc,const t_atom *argv)
 
 void MasterExt::m_reset() 
 { 
+    Forward(sym_reset,0,NULL);
     reset(); 
+}
+
+void MasterExt::Forward(const t_symbol *sym,int argc,const t_atom *argv)
+{
+    if(LIKELY(clock)) {
+        const Clock::Clients &clients = clock->GetClients();
+        for(Clock::Clients::const_iterator it = clients.begin(); it != clients.end(); ++it)
+            dynamic_cast<ClientExt *>(*it)->Message(sym,argc,argv);
+    }
 }
 
 void MasterExt::Setup(t_classid c)
 {
-	FLEXT_CADDATTR_GET(c,"timebase",mg_timebase);
+    sym_message = MakeSymbol("message");
+    sym_reset = MakeSymbol("reset");
+
+	FLEXT_CADDMETHOD_(c,0,sym_message,m_message);
+
+    FLEXT_CADDATTR_GET(c,"timebase",mg_timebase);
 	FLEXT_CADDATTR_VAR(c,"precision",mg_precision,ms_precision);
 }
+
+const t_symbol *MasterExt::sym_message,*MasterExt::sym_reset;
 
 } // namespace
 

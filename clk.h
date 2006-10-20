@@ -49,6 +49,11 @@ public:
     static Clock *Register(const t_symbol *n,Master *m);
     static void Unregister(Clock *clk,Master *m);
 
+    typedef std::set<Client *> Clients;
+
+    const Master *GetMaster() const { return master; }
+    const Clients &GetClients() const { return clients; }
+
 private:
 
     int n;
@@ -93,7 +98,6 @@ private:
     Master *master;
     float precision;
 
-    typedef std::set<Client *> Clients;
     Clients clients;
 
     typedef std::map<const t_symbol *,Clock *> Clocks;
@@ -126,9 +130,9 @@ protected:
 
 	void mg_timebase(float &t) const 
     { 
-        if(clock) { 
+        if(LIKELY(clock)) { 
             float f = (float)clock->Factor(); 
-            t = f?1.f/f:0; 
+            t = LIKELY(f)?1.f/f:0; 
         } 
         else 
             t = 0; 
@@ -136,12 +140,12 @@ protected:
 
 	void mg_precision(float &p) const 
     { 
-        p = clock?clock->Precision():0;
+        p = LIKELY(clock)?clock->Precision():0;
     }
 
 	void ms_precision(float p)
     {
-        if(clock) clock->Precision(p);
+        if(LIKELY(clock)) clock->Precision(p);
     }
 
 	Clock *clock;

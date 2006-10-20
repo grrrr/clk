@@ -7,6 +7,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 */
 
 #include "clk_client.h"
+#include "clk_master.h"
 
 namespace clk {
 
@@ -31,21 +32,25 @@ Client::~Client()
 
 void Client::ms_name(const t_symbol *n)
 {
-    if(clock) {
+    double current;
+    if(LIKELY(clock)) {
         if(clock->name == n) return;
+
+        current = clock->Current();
 
         Clock::Unregister(clock,this);
         clock = NULL;
     }
     else if(!n || n == sym__)
         return;
+    else
+        current = 0;
 
-	if(n) {
+	if(LIKELY(n)) {
         clock = Clock::Register(n,this);
-        m_reset();
+        offset += current-clock->Current();
 	}
 }
-
 
 ClientExt::ClientExt(int argc,const t_atom *argv)
     : Client(argc,argv)
@@ -72,16 +77,28 @@ void ClientExt::m_get(double offs)
 		ToSysFloat(0,(float)Current(offs)); 
 } 
 
+void ClientExt::Forward(const t_symbol *sym,int argc,const t_atom *argv)
+{
+    if(LIKELY(clock)) {
+        Master *master = const_cast<Master *>(clock->GetMaster());
+        FLEXT_ASSERT(master);
+        dynamic_cast<MasterExt *>(master)->Message(sym,argc,argv);
+    }
+}
+
 bool ClientExt::CbDsp() { setcnv(); return false; }
 
 void ClientExt::Setup(t_classid c)
 {
+    sym_message = MakeSymbol("message");
+
 	FLEXT_CADDATTR_VAR(c,"name",mg_name,ms_name);
 
 	FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
+	FLEXT_CADDMETHOD_(c,0,sym_message,m_message);
 
-	FLEXT_CADDATTR_VAR1(c,"offset",offset);
-	FLEXT_CADDATTR_VAR(c,"factor",factor,ms_factor);
+	FLEXT_CADDATTR_VAR(c,"offset",mg_offset,ms_offset);
+	FLEXT_CADDATTR_VAR(c,"factor",mg_factor,ms_factor);
 
 	FLEXT_CADDATTR_GET(c,"timebase",mg_timebase);
 
@@ -89,6 +106,7 @@ void ClientExt::Setup(t_classid c)
 	FLEXT_CADDATTR_VAR1(c,"t3mode",t3mode);
 }
 
+const t_symbol *ClientExt::sym_message;
 
 } // namespace
 

@@ -20,20 +20,37 @@ class Client
 
 protected:
 	Client(int argc,const t_atom *argv);
-    ~Client();
+    virtual ~Client();
 
     virtual void Update(double told,double tnew) = 0;
 
     void ms_name(const t_symbol *n);
 
-	void mg_name(const t_symbol *&n) { n = clock?clock->name:sym__; }
+	void mg_name(const t_symbol *&n) { n = LIKELY(clock)?clock->name:sym__; }
 
-	void m_reset() { offset = clock?-clock->Current():0; } 
+	void m_reset() { offset = LIKELY(clock)?-clock->Current():0; } 
 
-	double Current(double offs = 0) const { return (clock->Get(Time()+offs)+offset)*factor; }
+	double Convert(double time) const { return (time+offset)*factor; }
+	double Current(double offs = 0) const { return Convert(clock->Get(Time()+offs)); }
+
+    void Factor(double f) 
+    {
+        if(LIKELY(clock)) {
+            double current = clock->Current();
+            offset = (current+offset)*factor/f-current;
+        }
+		factor = f; 
+    }
+
+    double Factor() const { return factor; }
+
+    void Offset(double o) { offset = o; }
+
+    double Offset() const { return offset; }
 
 	Timer timer;
 
+private:
 	double offset,factor;
 };
 
@@ -43,21 +60,49 @@ class ClientExt
 {
     FLEXT_HEADER_S(ClientExt,flext_dsp,Setup)
 
+    friend class MasterExt;
+
 public:
     ClientExt(int argc,const t_atom *argv);
 
 	void m_get(double offs = 0);
 
-	void ms_factor(float f) 
-	{ 
-		if(f > 0) 
-			factor = f; 
-		else
-			post("%s - factor must be > 0",thisName()); 
-	} 
+    void ms_factor(float f) 
+    { 
+        if(UNLIKELY(f <= 0))
+		    post("%s - factor must be > 0",thisName()); 
+        else if(LIKELY(Factor() != f)) {
+            Factor(f);
+            if(clock) {
+                double c = clock->Current();
+                Update(c,c);
+            }
+        }
+    } 
 
+    void mg_factor(float &f) { f = (float)Factor(); }
+
+    void ms_offset(float o) 
+    { 
+        if(LIKELY(Offset() != o)) {
+            Offset(o); 
+            if(clock) {
+                double c = clock->Current();
+                Update(c,c);
+            }
+        }
+    }
+
+    void mg_offset(float &o) { o = (float)Offset(); }
+
+    void m_message(int argc,const t_atom *argv) { Forward(sym_message,argc,argv); }
 
 protected:
+
+    static const t_symbol *sym_message;
+
+    void Forward(const t_symbol *sym,int argc,const t_atom *argv);
+    void Message(const t_symbol *sym,int argc,const t_atom *argv) { ToOutAnything(GetOutAttr(),sym,argc,argv); }
 
 	virtual bool CbDsp();
 
@@ -68,10 +113,10 @@ protected:
 	FLEXT_CALLGET_S(mg_name)
 
 	FLEXT_CALLBACK(m_reset)
+	FLEXT_CALLBACK_V(m_message)
 
-    FLEXT_ATTRVAR_F(offset)
-	FLEXT_ATTRGET_F(factor)
-	FLEXT_CALLSET_F(ms_factor)
+    FLEXT_CALLVAR_F(mg_offset,ms_offset)
+	FLEXT_CALLVAR_F(mg_factor,ms_factor)
 
 	FLEXT_CALLGET_F(mg_timebase)
 

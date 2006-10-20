@@ -12,16 +12,21 @@ namespace clk {
 
 void Clock::Set(double x,double y,float w,bool pre)
 { 
-    if(pre) {
+    if(UNLIKELY(pre)) {
         n = -1;
         prex = x,prey = y;
         prew = w;
+
+        double f = Factor();
+        reset();
+        add(x,y,1);
+        add(x+1,y+f,0.5f);
     }
     else {
         double t = Time();
         double cold = Get(t);
 
-        if(n < 0) {
+        if(UNLIKELY(n < 0)) {
             reset();
             add(prex,prey,prew);
         }

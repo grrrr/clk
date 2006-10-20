@@ -20,7 +20,7 @@ class Master
 
 protected:
     Master(int argc,const t_atom *argv);
-    ~Master();
+    virtual ~Master(); // must be virtual because we need a polymorphic class here
 
     void reset() 
     { 
@@ -29,7 +29,7 @@ protected:
 
 	void settime(double x,double y) 
     { 
-        if(clock)
+        if(LIKELY(clock))
             clock->Set(x,y,weight,pre); 
         pre = false;
     }
@@ -47,17 +47,26 @@ class MasterExt
 {
     FLEXT_HEADER_S(MasterExt,flext_base,Setup)
 
+    friend class ClientExt;
+
 public:
     MasterExt(int argc,const t_atom *argv);
 
 	virtual void m_reset();
+
+    void m_message(int argc,const t_atom *argv) { Forward(sym_message,argc,argv); }
 	
 protected:
 
+    static const t_symbol *sym_message,*sym_reset;
+
+    void Forward(const t_symbol *sym,int argc,const t_atom *argv);
+    void Message(const t_symbol *sym,int argc,const t_atom *argv) { ToOutAnything(GetOutAttr(),sym,argc,argv); }
+
 	double current() const { return clock->Current(); }
 
+    FLEXT_CALLBACK_V(m_message)
 	FLEXT_CALLGET_F(mg_timebase)
-
 	FLEXT_CALLVAR_F(mg_precision,ms_precision)
 
     static void Setup(t_classid c);

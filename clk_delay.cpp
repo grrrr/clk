@@ -26,7 +26,7 @@ public:
 	void m_delay(double intv,double offs = 0) 
 	{ 
         if(LIKELY(clock)) {
-            double dur = intv/(clock->Factor()*factor);
+            double dur = intv/(clock->Factor()*Factor());
 
 		    if(t3mode) {
 			    double dticks = (dur+offs)/ticks2s;
@@ -62,13 +62,13 @@ protected:
 
         if(scheduled < 0) return; // clock not set
 
-        double time = (tnew+offset)*factor;
+        double time = Convert(tnew);
         double still = scheduled-time;
 
 //        post("%lf: time=%lf",Current(),time);
 
         if(UNLIKELY(still < 0)) {
-//            post("Missed!");
+            ToOutAnything(GetOutAttr(),sym_missed,0,NULL);
 
             // we missed the time already... output immediately!
             m_stop();
@@ -96,6 +96,8 @@ protected:
 
     static void Setup(t_classid c)
     {
+        sym_missed = MakeSymbol("missed");
+
 		FLEXT_CADDMETHOD(c,0,m_delay);
 		FLEXT_CADDMETHOD_FF(c,0,sym_list,m_delay2);
 		FLEXT_CADDMETHOD_(c,0,"stop",m_stop);
@@ -103,7 +105,11 @@ protected:
 
 	Timer timer;
 	double scheduled,tickoffs;
+
+    static const t_symbol *sym_missed;
 };
+
+const t_symbol *Delay::sym_missed;
 
 FLEXT_LIB_V("clk.delay",Delay)
 
