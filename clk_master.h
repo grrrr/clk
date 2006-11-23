@@ -36,8 +36,8 @@ protected:
 
     void setcurrent(double y) { settime(Time(),y); }
 
-    bool pre;
 	float weight;
+    bool pre;
 };
 
 

@@ -14,7 +14,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <flext.h>
 #include <set>
 #include <map>
-#include <exception>
+#include <stdexcept>
 
 namespace clk {
 
@@ -108,9 +108,8 @@ private:
 
 
 
-
-class ExcSyntax: public std::exception { };
-class ExcExisting: public std::exception { };
+class ExcSyntax: public std::runtime_error { public: ExcSyntax(): runtime_error("Syntax error") {} };
+class ExcExisting: public std::runtime_error { public: ExcExisting(): runtime_error("Name already existing") {} };
 
 
 class Parent

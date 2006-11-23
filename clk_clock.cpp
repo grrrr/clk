@@ -7,6 +7,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 */
 
 #include "clk_client.h"
+#include <math.h>
 
 namespace clk {
 
