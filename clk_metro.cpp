@@ -81,23 +81,30 @@ protected:
         // After this block has been executed "reentered" is true, so we won't execute it again upon return from recursion
 
 		if(LIKELY(!reentered)) {
-			double dur = intv/(clock->Factor()*Factor());
-			// reschedule
-			if(t3mode) {
-				double dticks = (dur+tickoffs)/ticks2s;
-				int iticks = (int)dticks;
-				tickoffs = (dticks-iticks)*ticks2s;
-                // recalculate dur
-				dur = iticks*ticks2s;
-			}
-			else
-				tickoffs = 0;
+            double factor = clock->Factor()*Factor();
+            // factor might be 0 if initialization is still in progress... we have to bail out in that case...
+            if(factor <= 0) 
+                post("%s - Can't schedule tick, invalid data for period",thisName());
+            else
+            {
+			    double dur = intv/factor;
+			    // reschedule
+			    if(t3mode) {
+				    double dticks = (dur+tickoffs)/ticks2s;
+				    int iticks = (int)dticks;
+				    tickoffs = (dticks-iticks)*ticks2s;
+                    // recalculate dur
+				    dur = iticks*ticks2s;
+			    }
+			    else
+				    tickoffs = 0;
 
-			timer.Delay(dur);
+			    timer.Delay(dur);
 
-            double cur = Current();
-            scheduled = cur+intv;
-//            post("%lf: Scheduled for +%lf = %lf",cur,dur,scheduled);
+                double cur = Current();
+                scheduled = cur+intv;
+    //            post("%lf: Scheduled for +%lf = %lf",cur,dur,scheduled);
+            }
         }
     }
 

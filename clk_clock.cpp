@@ -13,7 +13,7 @@ namespace clk {
 
 void Clock::Set(double x,double y,float w,bool pre)
 { 
-    if(UNLIKELY(pre)) {
+    if(UNLIKELY(pre && n)) {
         n = -1;
         prex = x,prey = y;
         prew = w;
