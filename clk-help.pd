@@ -1,4 +1,4 @@
-#N canvas 377 388 1097 600 12;
+#N canvas 339 296 1105 608 12;
 #X obj 156 230 symbol \$0-int;
 #X obj 156 254 symbol \$0-sync;
 #X obj 156 278 symbol \$0-tap;
@@ -27,7 +27,7 @@
 #X floatatom 108 513 8 0 0 0 - - -;
 #X obj 383 91 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
-#N canvas 0 0 462 181 inc 0;
+#N canvas 0 22 462 181 inc 0;
 #X obj 59 19 inlet;
 #X obj 56 134 outlet;
 #X obj 98 87 + 1;
@@ -99,18 +99,17 @@
 -1;
 #X obj 477 114 t b a;
 #X text 137 206 choose a clock master;
-#X msg 24 444 offset 0;
+#X msg 23 474 offset 0;
 #X text 23 372 set origin to now;
-#X text 23 425 reset to source;
+#X text 22 455 reset to source;
 #X obj 790 204 clk.tap \$0-tap @precision 0.001;
-#X msg 547 152 precision 1e-007;
+#X msg 547 152 precision 1e-07;
 #X msg 547 176 getprecision;
 #X text 546 119 precision controls;
 #X text 545 133 client timebase updates;
 #X obj 26 10 cnv 15 1000 45 empty empty clk 10 22 0 24 -260818 -1 0
 ;
 #X text 272 33 http://grrrr.org;
-#X text 272 13 syncable clock objects \, (C)2006 Thomas Grill;
 #X msg 28 85 message start;
 #X msg 266 413 message hello;
 #X obj 422 252 print SYNC;
@@ -136,6 +135,10 @@
 -1 -1 10 256;
 #X obj 459 111 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
+#X msg 24 430 reset 1000;
+#X text 23 411 set origin to arg;
+#X text 272 13 syncable clock objects \, (C)2006 \, 2007 Thomas Grill
+;
 #X connect 0 0 10 0;
 #X connect 1 0 10 0;
 #X connect 2 0 10 0;
@@ -145,22 +148,22 @@
 #X connect 6 0 9 0;
 #X connect 7 0 12 0;
 #X connect 10 0 12 0;
-#X connect 11 0 81 0;
+#X connect 11 0 80 0;
 #X connect 12 0 55 0;
 #X connect 12 1 19 0;
 #X connect 12 2 15 0;
 #X connect 13 0 63 0;
 #X connect 13 1 27 0;
-#X connect 13 2 92 0;
+#X connect 13 2 91 0;
 #X connect 14 0 59 0;
 #X connect 14 1 26 0;
-#X connect 14 2 90 0;
+#X connect 14 2 89 0;
 #X connect 16 0 12 0;
 #X connect 17 0 52 0;
 #X connect 18 0 17 0;
 #X connect 21 0 24 0;
 #X connect 22 0 11 0;
-#X connect 22 0 95 0;
+#X connect 22 0 94 0;
 #X connect 23 0 17 1;
 #X connect 24 0 22 0;
 #X connect 25 0 71 0;
@@ -168,7 +171,7 @@
 #X connect 29 0 14 0;
 #X connect 30 0 13 0;
 #X connect 31 0 66 0;
-#X connect 31 0 97 0;
+#X connect 31 0 96 0;
 #X connect 32 0 71 0;
 #X connect 33 0 12 0;
 #X connect 34 0 14 0;
@@ -203,19 +206,20 @@
 #X connect 66 0 22 1;
 #X connect 66 1 11 0;
 #X connect 68 0 12 0;
-#X connect 71 0 82 0;
+#X connect 71 0 81 0;
 #X connect 72 0 11 0;
 #X connect 73 0 11 0;
-#X connect 79 0 6 0;
-#X connect 80 0 12 0;
-#X connect 85 0 12 0;
-#X connect 86 0 85 0;
-#X connect 87 0 13 0;
-#X connect 88 0 87 0;
-#X connect 89 0 13 0;
-#X connect 90 0 91 0;
-#X connect 90 1 8 0;
-#X connect 92 0 93 0;
-#X connect 92 1 94 0;
-#X connect 96 0 24 1;
-#X connect 97 0 24 0;
+#X connect 78 0 6 0;
+#X connect 79 0 12 0;
+#X connect 84 0 12 0;
+#X connect 85 0 84 0;
+#X connect 86 0 13 0;
+#X connect 87 0 86 0;
+#X connect 88 0 13 0;
+#X connect 89 0 90 0;
+#X connect 89 1 8 0;
+#X connect 91 0 92 0;
+#X connect 91 1 93 0;
+#X connect 95 0 24 1;
+#X connect 96 0 24 0;
+#X connect 97 0 12 0;

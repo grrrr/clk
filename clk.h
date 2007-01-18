@@ -127,6 +127,14 @@ protected:
 		return dbl;
 	}
 
+	static double mkdbl(int argc,const t_atom *argv)
+	{
+		double d = argc >= 1?GetAFloat(argv[0]):0;
+		return argc >= 2?d+GetAFloat(argv[1]):d;
+	}
+
+	static double mkdbl(const AtomList &l) { return mkdbl(l.Count(),l.Atoms()); }
+
 	void mg_timebase(float &t) const 
     { 
         if(LIKELY(clock)) { 

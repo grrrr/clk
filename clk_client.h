@@ -1,7 +1,7 @@
 /* 
 clk - syncable clocking objects
 
-Copyright (c)2006 Thomas Grill (gr@grrrr.org)
+Copyright (c)2006,2007 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
@@ -28,7 +28,14 @@ protected:
 
 	void mg_name(const t_symbol *&n) { n = LIKELY(clock)?clock->name:sym__; }
 
-	void m_reset() { offset = LIKELY(clock)?-clock->Current():0; } 
+	void m_reset(int argc,const t_atom *argv) 
+	{
+		double o = LIKELY(clock)?-clock->Current():0;
+		if(!argc)
+			offset = o;
+		else
+			offset = o+mkdbl(argc,argv);
+	} 
 
 	double Convert(double time) const { return (time+offset)*factor; }
 	double Current(double offs = 0) const { return Convert(clock->Get(Time()+offs)); }
@@ -67,8 +74,9 @@ public:
 
 	void m_get(double offs = 0);
 
-    void ms_factor(float f) 
+    void ms_factor(const AtomList &l) 
     { 
+		double f = mkdbl(l);	
         if(UNLIKELY(f <= 0))
 		    post("%s - factor must be > 0",thisName()); 
         else if(LIKELY(Factor() != f)) {
@@ -80,10 +88,18 @@ public:
         }
     } 
 
-    void mg_factor(float &f) { f = (float)Factor(); }
+    void mg_factor(AtomList &l) 
+	{ 
+		double d = Factor();
+		if(dblprec) 
+			mkdbl(l(2).Atoms(),d);
+		else
+			SetFloat(l(1)[0],(float)d);
+	}
 
-    void ms_offset(float o) 
+    void ms_offset(const AtomList &l) 
     { 
+		double o = mkdbl(l);
         if(LIKELY(Offset() != o)) {
             Offset(o); 
             if(clock) {
@@ -93,7 +109,14 @@ public:
         }
     }
 
-    void mg_offset(float &o) { o = (float)Offset(); }
+    void mg_offset(AtomList &l) 
+	{ 
+		double d = Offset();
+		if(dblprec) 
+			mkdbl(l(2).Atoms(),d);
+		else
+			SetFloat(l(1)[0],(float)d);
+	}
 
     void m_message(int argc,const t_atom *argv) { Forward(sym_message,argc,argv); }
 
@@ -112,11 +135,11 @@ protected:
 	FLEXT_CALLSET_S(ms_name)
 	FLEXT_CALLGET_S(mg_name)
 
-	FLEXT_CALLBACK(m_reset)
+	FLEXT_CALLBACK_V(m_reset)
 	FLEXT_CALLBACK_V(m_message)
 
-    FLEXT_CALLVAR_F(mg_offset,ms_offset)
-	FLEXT_CALLVAR_F(mg_factor,ms_factor)
+    FLEXT_CALLVAR_V(mg_offset,ms_offset)
+	FLEXT_CALLVAR_V(mg_factor,ms_factor)
 
 	FLEXT_CALLGET_F(mg_timebase)
 
