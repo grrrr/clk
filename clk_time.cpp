@@ -25,7 +25,7 @@ public:
 
 protected:
 
-    virtual void Update(double told,double tnew) {}
+    virtual void Update(double told,double tnew,bool missedmsg) {}
 
 	FLEXT_CALLBACK(m_get)
 	FLEXT_CALLBACK_F(m_float)

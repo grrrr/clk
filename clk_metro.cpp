@@ -41,7 +41,7 @@ public:
 
 protected:
 
-    virtual void Update(double told,double tnew)
+    virtual void Update(double told,double tnew,bool missedmsg)
     {
         FLEXT_ASSERT(clock);
 
@@ -52,12 +52,18 @@ protected:
 
 //        post("%lf: time=%lf",Current(),time);
 
-        while(UNLIKELY(still < 0)) {
-            ToOutAnything(GetOutAttr(),sym_missed,0,NULL);
+        if(LIKELY(missedmsg)) {
+            while(UNLIKELY(still < 0)) {
+                ToOutAnything(GetOutAttr(),sym_missed,0,NULL);
 
-            // we missed the time already... output immediately!
-            m_get();
-            still += perintv;
+                // we missed the time already... output immediately!
+                m_get();
+                still += perintv;
+            }
+        }
+        else if(UNLIKELY(still < 0)) {
+            // forget all missed ticks, advance to the next future one
+            still = perintv+fmod(still,perintv);
         }
 
         // schedule new delay

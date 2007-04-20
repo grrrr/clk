@@ -22,7 +22,15 @@ protected:
 	Client(int argc,const t_atom *argv);
     virtual ~Client();
 
-    virtual void Update(double told,double tnew) = 0;
+    virtual void Update(double told,double tnew,bool missedmsg = true) = 0;
+
+    void Update() 
+    { 
+        if(clock) { 
+            double t = clock->Current(); 
+            Update(t,t,false); 
+        }
+    }
 
     void ms_name(const t_symbol *n);
 
@@ -81,10 +89,7 @@ public:
 		    post("%s - factor must be > 0",thisName()); 
         else if(LIKELY(Factor() != f)) {
             Factor(f);
-            if(clock) {
-                double c = clock->Current();
-                Update(c,c);
-            }
+            Update();
         }
     } 
 
@@ -101,11 +106,8 @@ public:
     { 
 		double o = mkdbl(l);
         if(LIKELY(Offset() != o)) {
-            Offset(o); 
-            if(clock) {
-                double c = clock->Current();
-                Update(c,c);
-            }
+            Offset(o);
+            Update();
         }
     }
 

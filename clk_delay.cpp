@@ -56,7 +56,7 @@ public:
 
 protected:
 
-    virtual void Update(double told,double tnew)
+    virtual void Update(double told,double tnew,bool missedmsg)
     {
         FLEXT_ASSERT(clock);
 
@@ -68,11 +68,13 @@ protected:
 //        post("%lf: time=%lf",Current(),time);
 
         if(UNLIKELY(still < 0)) {
-            ToOutAnything(GetOutAttr(),sym_missed,0,NULL);
-
-            // we missed the time already... output immediately!
             m_stop();
-            m_get();
+
+            if(LIKELY(missedmsg)) {
+                ToOutAnything(GetOutAttr(),sym_missed,0,NULL);
+                // we missed the time already... output immediately!
+                m_get();
+            }
         }
         else {
 //            post("Reschedule in %lf!",still);
