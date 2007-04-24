@@ -1,7 +1,7 @@
 /* 
 clk - syncable clocking objects
 
-Copyright (c)2006 Thomas Grill (gr@grrrr.org)
+Copyright (c)2006-2007 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
@@ -59,7 +59,7 @@ void MasterExt::Setup(t_classid c)
 
 	FLEXT_CADDMETHOD_(c,0,sym_message,m_message);
 
-    FLEXT_CADDATTR_GET(c,"timebase",mg_timebase);
+    FLEXT_CADDATTR_VAR(c,"timebase",mg_timebase,ms_timebase);
 	FLEXT_CADDATTR_VAR(c,"precision",mg_precision,ms_precision);
 }
 

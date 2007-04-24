@@ -1,7 +1,7 @@
 /* 
 clk - syncable clocking objects
 
-Copyright (c)2006 Thomas Grill (gr@grrrr.org)
+Copyright (c)2006-2007 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
@@ -36,6 +36,13 @@ public:
 
 	double Offset() const { return a; }
 	double Factor() const { return b; }
+
+	void Factor(double f)
+    {
+        reset();
+        n = -1;
+        b = f;
+    }
 
     float Precision() const { return precision; }
     void Precision(float f) { precision = f; }
@@ -77,7 +84,8 @@ private:
 	void reset()
 	{
         n = 0;
-		a = b = s = sx = sy = sxx = sxy = 0;
+		a = b = 0;
+        s = sx = sy = sxx = sxy = 0;
 	}
 
     void add(double x,double y,float w)
@@ -91,8 +99,12 @@ private:
         ++n;
 
 	    double d = s*sxx-sx*sx;
-	    a = (sxx*sy-sx*sxy)/d;
-	    b = (s*sxy-sx*sy)/d;
+        if(LIKELY(d)) {
+    	    a = (sxx*sy-sx*sxy)/d;
+	        b = (s*sxy-sx*sy)/d;
+        }
+        else
+            a = b = 0;
     }
 
     Master *master;
@@ -143,6 +155,12 @@ protected:
         } 
         else 
             t = 0; 
+    }
+
+	void ms_timebase(float t)
+    { 
+        if(LIKELY(clock) && LIKELY(t))
+            clock->Factor(1.f/t);
     }
 
 	void mg_precision(float &p) const 
