@@ -1,7 +1,7 @@
 /* 
 clk - syncable clocking objects
 
-Copyright (c)2006,2007 Thomas Grill (gr@grrrr.org)
+Copyright (c)2006-2007 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
@@ -32,9 +32,14 @@ protected:
         }
     }
 
-    void ms_name(const t_symbol *n);
+    void ms_name(int argc = 0,const t_atom *argv = NULL);
 
-	void mg_name(const t_symbol *&n) { n = LIKELY(clock)?clock->name:sym__; }
+    void ms_name(const AtomList &l) { ms_name(l.Count(),l.Atoms()); }
+
+	void mg_name(AtomList &l) 
+    { 
+        if(LIKELY(clock)) SetSymbol(l(1)[0],clock->name); 
+    }
 
 	void m_reset(int argc,const t_atom *argv) 
 	{
@@ -134,8 +139,8 @@ protected:
 	void setcnv() { ticks2s = (double)Blocksize()/(double)Samplerate(); }
 
 
-	FLEXT_CALLSET_S(ms_name)
-	FLEXT_CALLGET_S(mg_name)
+	FLEXT_CALLSET_V(ms_name)
+	FLEXT_CALLGET_V(mg_name)
 
 	FLEXT_CALLBACK_V(m_reset)
 	FLEXT_CALLBACK_V(m_message)

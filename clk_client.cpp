@@ -1,7 +1,7 @@
 /* 
 clk - syncable clocking objects
 
-Copyright (c)2006 Thomas Grill (gr@grrrr.org)
+Copyright (c)2006-2007 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
@@ -14,24 +14,21 @@ namespace clk {
 Client::Client(int argc,const t_atom *argv)
     : offset(0),factor(1)
 {
-	const t_symbol *n;
-	if(!argc)
-		n = NULL;
-	else if(argc == 1 && IsSymbol(argv[0]))
-		n = GetSymbol(argv[0]);
-	else 
-        throw ExcSyntax();
-
-	ms_name(n);
+    ms_name(argc,argv);
 }
 
 Client::~Client()
 {
-	ms_name(NULL);
+	ms_name();
 }
 
-void Client::ms_name(const t_symbol *n)
+void Client::ms_name(int argc,const t_atom *argv)
 {
+	if(argc && !IsSymbol(*argv))
+        throw ExcSyntax();
+
+    const t_symbol *n = argc?GetSymbol(*argv):NULL;
+
     double current;
     if(LIKELY(clock)) {
         if(clock->name == n) return;
@@ -41,7 +38,7 @@ void Client::ms_name(const t_symbol *n)
         Clock::Unregister(clock,this);
         clock = NULL;
     }
-    else if(!n || n == sym__)
+    else if(!n)
         return;
     else
         current = 0;
@@ -81,8 +78,8 @@ void ClientExt::Forward(const t_symbol *sym,int argc,const t_atom *argv)
 {
     if(LIKELY(clock)) {
         Master *master = const_cast<Master *>(clock->GetMaster());
-        FLEXT_ASSERT(master);
-        dynamic_cast<MasterExt *>(master)->Message(sym,argc,argv);
+        if(master)
+            dynamic_cast<MasterExt *>(master)->Message(sym,argc,argv);
     }
 }
 

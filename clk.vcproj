@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\flext\source;c:\data\pd\pd-cvs\src"
+				AdditionalIncludeDirectories="..\flext\source;c:\data\pdmax\pd\src"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -36,7 +36,7 @@
 				AdditionalDependencies="pd.lib"
 				OutputFile="$(OutDir)/clk.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="c:\data\pd\pd-cvs\bin"
+				AdditionalLibraryDirectories="c:\data\pdmax\pd\bin"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/clk.pdb"
 				SubSystem="2"
