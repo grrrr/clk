@@ -78,7 +78,8 @@ protected:
 
     void SchedDelay(double intv,bool bang = true)
     {
-        FLEXT_ASSERT(clock);
+        // obviously the metro can have been unregistered before being re-scheduled
+        if(!clock) return; 
 
 		reentered = false;
 
