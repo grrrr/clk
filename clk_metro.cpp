@@ -82,13 +82,19 @@ protected:
         if(!clock) return; 
 
 		reentered = false;
-
+#if 1 // tentative fix
+        double outoffs = tickoffs;
+#else
 		if(bang) m_get(tickoffs);  // bang out
         // Through the outlet in m_get we might re-enter this function.
         // "reentered" is false then and the following block is executed and a new delay scheduled.
         // After this block has been executed "reentered" is true, so we won't execute it again upon return from recursion
 
-		if(LIKELY(!reentered)) {
+        // although we might not have been reentered, the metro might have been stopped in the meantime
+
+		if(LIKELY(!reentered) && LIKELY(scheduled >= 0)) 
+#endif
+        {
             double factor = clock->Factor()*Factor();
             // factor might be 0 if initialization is still in progress... we have to bail out in that case...
             if(factor <= 0) 
@@ -114,6 +120,10 @@ protected:
     //            post("%lf: Scheduled for +%lf = %lf",cur,dur,scheduled);
             }
         }
+
+#if 1 // tentative fix
+		if(bang) m_get(outoffs);  // bang out
+#endif
     }
 
 	FLEXT_CALLBACK_F(m_metro)
