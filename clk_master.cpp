@@ -4,6 +4,10 @@ clk - syncable clocking objects
 Copyright (c)2006-2007 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
+
+$LastChangedRevision:$
+$LastChangedDate $
+$LastChangedBy$
 */
 
 #include "clk_master.h"
@@ -15,10 +19,20 @@ Master::Master(int argc,const t_atom *argv)
     : weight(0.5)
     , pre(true)
 {
-    if(UNLIKELY(argc != 1 || !IsSymbol(*argv)))
+    const t_symbol *name;
+
+    if(UNLIKELY(argc != 1))
         throw ExcSyntax();
 
-    const t_symbol *name = GetSymbol(*argv);
+    // that's mainly for missing $-args which are set as 0
+    if(CanbeInt(*argv)) {
+        char tmp[20];
+        sprintf(tmp,"%i",GetAInt(*argv));
+        name = MakeSymbol(tmp);
+    }
+    else
+        name = GetSymbol(*argv);
+
     clock = Clock::Register(name,this);
 
     if(UNLIKELY(!clock)) 

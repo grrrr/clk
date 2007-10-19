@@ -4,6 +4,10 @@ clk - syncable clocking objects
 Copyright (c)2006-2007 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
+
+$LastChangedRevision$
+$LastChangedDate$
+$LastChangedBy$
 */
 
 #include "clk_client.h"
@@ -24,10 +28,17 @@ Client::~Client()
 
 void Client::ms_name(int argc,const t_atom *argv)
 {
-	if(argc && !IsSymbol(*argv))
-        throw ExcSyntax();
-
-    const t_symbol *n = argc?GetSymbol(*argv):NULL;
+    const t_symbol *n;
+    if(!argc)
+        n = NULL;
+    else if(CanbeInt(*argv)) {
+        // that's mainly for missing $-args which are set as 0
+        char tmp[20];
+        sprintf(tmp,"%i",GetAInt(*argv));
+        n = MakeSymbol(tmp);
+    }
+    else
+        n = GetSymbol(*argv);
 
     double current;
     if(LIKELY(clock)) {
