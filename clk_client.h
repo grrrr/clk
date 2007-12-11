@@ -4,6 +4,10 @@ clk - syncable clocking objects
 Copyright (c)2006-2007 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
+
+$LastChangedRevision$
+$LastChangedDate$
+$LastChangedBy$
 */
 
 #ifndef __CLK_CLIENT_H
@@ -104,7 +108,7 @@ public:
 		if(dblprec) 
 			mkdbl(l(2).Atoms(),d);
 		else
-			SetFloat(l(1)[0],(float)d);
+			SetFloat(l(1)[0],static_cast<float>(d));
 	}
 
     void ms_offset(const AtomList &l) 
@@ -122,7 +126,7 @@ public:
 		if(dblprec) 
 			mkdbl(l(2).Atoms(),d);
 		else
-			SetFloat(l(1)[0],(float)d);
+			SetFloat(l(1)[0],static_cast<float>(d));
 	}
 
     void m_message(int argc,const t_atom *argv) { Forward(sym_message,argc,argv); }

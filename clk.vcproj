@@ -71,6 +71,9 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="2"
+				ImproveFloatingPointConsistency="FALSE"
+				AdditionalIncludeDirectories="..\flext\source;c:\data\pdmax\pd\src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2"
 				RuntimeLibrary="4"
 				RuntimeTypeInfo="TRUE"
@@ -85,6 +88,7 @@
 				AdditionalDependencies="pd.lib"
 				OutputFile="$(OutDir)/clk.dll"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="c:\data\pdmax\pd\bin"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"

@@ -76,13 +76,13 @@ void ClientExt::m_get(double offs)
 { 
     if(!clock) return;
 
-	ToSysFloat(1,(float)(offs*1000.));
+	ToSysFloat(1,static_cast<float>(offs*1000.));
 	if(dblprec) {
 		t_atom dbl[2];
 		ToSysList(0,2,mkdbl(dbl,Current(offs)));
 	}
 	else
-		ToSysFloat(0,(float)Current(offs)); 
+		ToSysFloat(0,static_cast<float>(Current(offs))); 
 } 
 
 void ClientExt::Forward(const t_symbol *sym,int argc,const t_atom *argv)

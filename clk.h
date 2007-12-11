@@ -4,6 +4,10 @@ clk - syncable clocking objects
 Copyright (c)2006-2007 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
+
+$LastChangedRevision$
+$LastChangedDate$
+$LastChangedBy$
 */
 
 #ifndef __CLK_H
@@ -131,13 +135,20 @@ protected:
 
     Parent(): clock(NULL) {}
 
+#ifdef _MSC_VER
+#pragma optimize("p",off)  // improve floating point precision consistency
+#endif
 	static t_atom *mkdbl(t_atom *dbl,double d)
 	{
-		float f = (float)d;
+		float f = static_cast<float>(d);
+        float r = static_cast<float>(d-f);
 		SetFloat(dbl[0],f);
-		SetFloat(dbl[1],(float)(d-f));
+		SetFloat(dbl[1],r);
 		return dbl;
 	}
+#ifdef _MSC_VER
+#pragma optimize("p",on)
+#endif
 
 	static double mkdbl(int argc,const t_atom *argv)
 	{
@@ -150,7 +161,7 @@ protected:
 	void mg_timebase(float &t) const 
     { 
         if(LIKELY(clock)) { 
-            float f = (float)clock->Factor(); 
+            float f = static_cast<float>(clock->Factor()); 
             t = LIKELY(f)?1.f/f:0; 
         } 
         else 
