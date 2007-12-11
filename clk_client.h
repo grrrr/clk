@@ -51,7 +51,7 @@ protected:
 		if(!argc)
 			offset = o;
 		else
-			offset = o+mkdbl(argc,argv);
+			offset = o+GetDouble(argc,argv);
 	} 
 
 	double Convert(double time) const { return (time+offset)*factor; }
@@ -93,7 +93,7 @@ public:
 
     void ms_factor(const AtomList &l) 
     { 
-		double f = mkdbl(l);	
+		double f = GetDouble(l);	
         if(UNLIKELY(f <= 0))
 		    post("%s - factor must be > 0",thisName()); 
         else if(LIKELY(Factor() != f)) {
@@ -106,14 +106,14 @@ public:
 	{ 
 		double d = Factor();
 		if(dblprec) 
-			mkdbl(l(2).Atoms(),d);
+			SetDouble(l,d);
 		else
 			SetFloat(l(1)[0],static_cast<float>(d));
 	}
 
     void ms_offset(const AtomList &l) 
     { 
-		double o = mkdbl(l);
+		double o = GetDouble(l);
         if(LIKELY(Offset() != o)) {
             Offset(o);
             Update();
@@ -124,7 +124,7 @@ public:
 	{ 
 		double d = Offset();
 		if(dblprec) 
-			mkdbl(l(2).Atoms(),d);
+			SetDouble(l,d);
 		else
 			SetFloat(l(1)[0],static_cast<float>(d));
 	}

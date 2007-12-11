@@ -135,29 +135,6 @@ protected:
 
     Parent(): clock(NULL) {}
 
-#ifdef _MSC_VER
-#pragma optimize("p",off)  // improve floating point precision consistency
-#endif
-	static t_atom *mkdbl(t_atom *dbl,double d)
-	{
-		float f = static_cast<float>(d);
-        float r = static_cast<float>(d-f);
-		SetFloat(dbl[0],f);
-		SetFloat(dbl[1],r);
-		return dbl;
-	}
-#ifdef _MSC_VER
-#pragma optimize("p",on)
-#endif
-
-	static double mkdbl(int argc,const t_atom *argv)
-	{
-		double d = argc >= 1?GetAFloat(argv[0]):0;
-		return argc >= 2?d+GetAFloat(argv[1]):d;
-	}
-
-	static double mkdbl(const AtomList &l) { return mkdbl(l.Count(),l.Atoms()); }
-
 	void mg_timebase(float &t) const 
     { 
         if(LIKELY(clock)) { 
