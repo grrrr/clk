@@ -13,6 +13,8 @@ $LastChangedBy$
 #include "clk_client.h"
 #include <math.h>
 
+#define LIMIT 1.e-4f
+
 namespace clk {
 
 class Metro
@@ -24,6 +26,7 @@ public:
     Metro(int argc,const t_atom *argv)
         : ClientExt(argc,argv)
         , scheduled(-1)
+        , limit(LIMIT)
     {
 		FLEXT_ADDTIMER(timer,CbTimer);
     }
@@ -57,17 +60,14 @@ protected:
 
 //        post("%lf: time=%lf",Current(),time);
 
-        if(LIKELY(missedmsg)) {
-            while(UNLIKELY(still < 0)) {
-                ToOutAnything(GetOutAttr(),sym_missed,0,NULL);
-
-                // we missed the time already... output immediately!
+        if(UNLIKELY(still < 0)) {
+            if(LIKELY(missedmsg)) {
+                t_atom at[2]; 
+                ToOutAnything(GetOutAttr(),sym_missed,dblprec?2:1,SetDouble(at,-still));
                 m_get();
-                still += perintv;
             }
-        }
-        else if(UNLIKELY(still < 0)) {
-            // forget all missed ticks, advance to the next future one
+
+            // advance to the next future tick
             still = perintv+fmod(still,perintv);
         }
 
@@ -100,13 +100,15 @@ protected:
 #endif
         {
             double factor = clock->Factor()*Factor();
-            // factor might be 0 if initialization is still in progress... we have to bail out in that case...
-            if(factor <= 0) 
-                post("%s - Can't schedule tick, invalid data for period",thisName());
-            else
-            {
-			    double dur = intv/factor;
-			    // reschedule
+		    double dur = intv/factor;
+            // factor might be 0 if initialization is still in progress or big jumps in the reference time base happened
+            if(dur < 0) {
+                t_atom at[2]; 
+                ToOutAnything(GetOutAttr(),sym_limit,dblprec?2:1,SetDouble(at,dur));
+                timer.Delay(limit);
+            }
+            else {
+                // reschedule
 			    if(t3mode) {
 				    double dticks = (dur+tickoffs)/ticks2s;
 				    int iticks = (int)dticks;
@@ -117,12 +119,19 @@ protected:
 			    else
 				    tickoffs = 0;
 
-			    timer.Delay(dur);
+                if(dur >= limit)
+			        timer.Delay(dur);
+                else {
+                    t_atom at[2]; 
+                    ToOutAnything(GetOutAttr(),sym_limit,dblprec?2:1,SetDouble(at,dur));
+			        timer.Delay(limit);
+                }
 
-                double cur = Current();
-                scheduled = cur+intv;
     //            post("%lf: Scheduled for +%lf = %lf",cur,dur,scheduled);
             }
+
+            double cur = Current();
+            scheduled = cur+intv;
         }
 
 #if 1 // tentative fix
@@ -136,23 +145,31 @@ protected:
 
 	FLEXT_CALLBACK_T(CbTimer)
 
+	FLEXT_ATTRVAR_F(limit)
+
     static void Setup(t_classid c)
     {
         sym_missed = MakeSymbol("missed");
+        sym_limit = MakeSymbol("limit");
 
 		FLEXT_CADDMETHOD(c,0,m_metro);
 		FLEXT_CADDMETHOD_FF(c,0,sym_list,m_metro2);
 		FLEXT_CADDMETHOD_(c,0,"stop",m_stop);
+
+        FLEXT_CADDATTR_VAR1(c,sym_limit,limit);
     }
 
 	Timer timer;
 	double scheduled,perintv,tickoffs;
     bool reentered;
+    float limit;
 
     static const t_symbol *sym_missed;
+    static const t_symbol *sym_limit;
 };
 
 const t_symbol *Metro::sym_missed;
+const t_symbol *Metro::sym_limit;
 
 FLEXT_LIB_V("clk.metro, clk",Metro)
 

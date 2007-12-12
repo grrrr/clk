@@ -12,6 +12,8 @@ $LastChangedBy$
 
 #include "clk_client.h"
 
+#define LIMIT 1.e-4f
+
 namespace clk {
 
 class Delay
@@ -23,6 +25,7 @@ public:
     Delay(int argc,const t_atom *argv)
         : ClientExt(argc,argv)
         , scheduled(-1)
+        , limit(LIMIT)
     {
 		FLEXT_ADDTIMER(timer,CbTimer);
     }
@@ -30,23 +33,37 @@ public:
 	void m_delay(double intv,double offs = 0) 
 	{ 
         if(LIKELY(clock)) {
-            double dur = intv/(clock->Factor()*Factor());
+            double factor = clock->Factor()*Factor();
+            double dur = intv/factor;
+            // factor might be 0 if initialization is still in progress or big jumps in the reference time base happened
+            if(dur < 0) {
+                t_atom at[2]; 
+                ToOutAnything(GetOutAttr(),sym_limit,dblprec?2:1,SetDouble(at,dur));
+            }
+            else {
+		        if(t3mode) {
+			        double dticks = (dur+offs)/ticks2s;
+			        int iticks = (int)dticks;
+			        tickoffs = (dticks-iticks)*ticks2s;
+			        dur = iticks*ticks2s;
+		        }
+		        else
+                    tickoffs = 0;
+        		
+		        // schedule
+                if(dur >= limit)
+			        timer.Delay(dur);
+                else {
+                    t_atom at[2]; 
+                    ToOutAnything(GetOutAttr(),sym_limit,dblprec?2:1,SetDouble(at,dur));
+			        timer.Delay(limit);
+                }
 
-		    if(t3mode) {
-			    double dticks = (dur+offs)/ticks2s;
-			    int iticks = (int)dticks;
-			    tickoffs = (dticks-iticks)*ticks2s;
-			    dur = iticks*ticks2s;
-		    }
-		    else
-                tickoffs = 0;
-    		
-		    // schedule
-		    timer.Delay(dur); 
+    //            post("%lf: Scheduled for +%lf = %lf",cur,dur,scheduled);
+            }
 
             double cur = Current();
             scheduled = cur+intv;
-//            post("%lf: Scheduled for +%lf = %lf",cur,dur,scheduled);
         }
 	}
 
@@ -75,7 +92,8 @@ protected:
             m_stop();
 
             if(LIKELY(missedmsg)) {
-                ToOutAnything(GetOutAttr(),sym_missed,0,NULL);
+                t_atom at[2]; 
+                ToOutAnything(GetOutAttr(),sym_missed,dblprec?2:1,SetDouble(at,-still));
                 // we missed the time already... output immediately!
                 m_get();
             }
@@ -100,22 +118,30 @@ protected:
 
 	FLEXT_CALLBACK_T(CbTimer)
 
+	FLEXT_ATTRVAR_F(limit)
+
     static void Setup(t_classid c)
     {
         sym_missed = MakeSymbol("missed");
+        sym_limit = MakeSymbol("limit");
 
 		FLEXT_CADDMETHOD(c,0,m_delay);
 		FLEXT_CADDMETHOD_FF(c,0,sym_list,m_delay2);
 		FLEXT_CADDMETHOD_(c,0,"stop",m_stop);
+
+		FLEXT_CADDATTR_VAR1(c,sym_limit,limit);
     }
 
 	Timer timer;
 	double scheduled,tickoffs;
+    float limit;
 
     static const t_symbol *sym_missed;
+    static const t_symbol *sym_limit;
 };
 
 const t_symbol *Delay::sym_missed;
+const t_symbol *Delay::sym_limit;
 
 FLEXT_LIB_V("clk.delay, clk",Delay)
 
