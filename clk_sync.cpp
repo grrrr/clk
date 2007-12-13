@@ -34,8 +34,6 @@ protected:
 	FLEXT_CALLBACK_F(m_set)
 	FLEXT_CALLBACK_FF(m_double)
 
-    FLEXT_ATTRVAR_F(weight)
-
     static void Setup(t_classid c)
     {
 		FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
@@ -44,8 +42,6 @@ protected:
 
         FLEXT_CADDMETHOD_FF(c,0,sym_list,m_double);
 		FLEXT_CADDMETHOD_FF(c,0,"double",m_double);
-
-        FLEXT_CADDATTR_VAR1(c,"weight",weight);
     }
 };
 

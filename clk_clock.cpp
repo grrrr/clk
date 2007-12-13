@@ -1,7 +1,7 @@
 /* 
 clk - syncable clocking objects
 
-Copyright (c)2006 Thomas Grill (gr@grrrr.org)
+Copyright (c)2006-2007 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -15,17 +15,26 @@ $LastChangedBy$
 
 namespace clk {
 
-void Clock::Set(double x,double y,float w,bool pre)
+void Clock::Set(double x,double y,bool pre)
 { 
     if(UNLIKELY(pre && n)) {
         n = -1;
         prex = x,prey = y;
-        prew = w;
 
         double f = Factor();
         reset();
-        add(x,y,1);
-        add(x+1,y+f,0.5f);
+
+#ifndef SLIDING
+        float w = weight;
+        weight = 1;
+        add(x,y);
+        weight = 0.5;
+        add(x+1,y+f);
+        weight = w;
+#else
+        add(x,y);
+        add(x+1,y+f);
+#endif
     }
     else {
         double t = Time();
@@ -33,9 +42,9 @@ void Clock::Set(double x,double y,float w,bool pre)
 
         if(UNLIKELY(n < 0)) {
             reset();
-            add(prex,prey,prew);
+            add(prex,prey);
         }
-        add(x,y,w);
+        add(x,y);
 
         double cnew = Get(t);
 

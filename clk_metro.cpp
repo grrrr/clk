@@ -105,7 +105,7 @@ protected:
             if(dur < 0) {
                 t_atom at[2]; 
                 ToOutAnything(GetOutAttr(),sym_limit,dblprec?2:1,SetDouble(at,dur));
-                timer.Delay(limit);
+                dur = limit;
             }
             else {
                 // reschedule
@@ -119,19 +119,21 @@ protected:
 			    else
 				    tickoffs = 0;
 
-                if(dur >= limit)
-			        timer.Delay(dur);
-                else {
+                // check
+                if(dur < limit) {
                     t_atom at[2]; 
                     ToOutAnything(GetOutAttr(),sym_limit,dblprec?2:1,SetDouble(at,dur));
-			        timer.Delay(limit);
+			        dur = limit;
                 }
-
-    //            post("%lf: Scheduled for +%lf = %lf",cur,dur,scheduled);
             }
+
+            // schedule
+            timer.Delay(dur);
 
             double cur = Current();
             scheduled = cur+intv;
+
+//            fprintf(stderr,"%lf: Scheduled for +%lf = %lf\n",cur,dur,scheduled);
         }
 
 #if 1 // tentative fix

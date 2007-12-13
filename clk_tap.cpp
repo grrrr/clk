@@ -34,16 +34,12 @@ protected:
     FLEXT_CALLBACK(m_reset)
 	FLEXT_CALLBACK(m_tap)
 
-    FLEXT_ATTRVAR_F(weight)
-
     FLEXT_ATTRGET_I(taps)
 
     static void Setup(t_classid c)
     {
 		FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
 		FLEXT_CADDMETHOD(c,0,m_tap); // bang
-
-        FLEXT_CADDATTR_VAR1(c,"weight",weight);
 
         FLEXT_CADDATTR_GET(c,"taps",taps);
     }

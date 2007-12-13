@@ -18,7 +18,11 @@ $LastChangedBy$
 #include <flext.h>
 #include <set>
 #include <map>
+#include <vector>
 #include <stdexcept>
+
+#define SLIDING 10
+#define MAXSLIDING 1000
 
 namespace clk {
 
@@ -29,10 +33,101 @@ class Master;
 class Client;
 
 
+template <class T>
+class SlidingAvg
+{
+public:
+    SlidingAvg(int sz)
+        : sum(0),pos(0)
+    {
+        val.reserve(sz);
+    }
+
+    operator T() const 
+    {
+        return sum/val.size();
+    }
+
+    SlidingAvg &clear()
+    {
+        sum = 0;
+        val.resize(0);
+        pos = 0;
+        return *this;
+    }
+
+    size_t size() const { return val.capacity(); }
+
+    SlidingAvg &resize(size_t sz)
+    {
+        if(sz < val.size()) {
+            // preserve values
+            rotate(-(int)pos);
+            pos = 0;
+        }
+        val.reserve(sz);
+        return recalc();
+    }
+
+    SlidingAvg &rotate(int k)
+    {
+        const int n = (int)size();
+        if(k < 0 || k >= n) {
+            k %= n;
+            if (k < 0) k += n;
+        }
+        if (k == 0) return *this;
+
+        int c = 0;
+        for(int v = 0; c < n; v++) {
+            int t = v, tp = v + k;
+            T tmp = val[v];
+            c++;
+            while (tp != v) {
+                val[t] = val[tp];
+                t = tp;
+                tp += k;
+                if (tp >= n) tp -= n;
+                c++;
+            }
+            val[t] = tmp;
+        }
+
+        return *this;
+    }
+
+    SlidingAvg &recalc()
+    {
+        sum = 0;
+        for(std::vector<T>::const_iterator it = val.begin(); it != val.end(); ++it)
+            sum += *it;
+        return *this;
+    }
+
+    SlidingAvg operator +=(T v)
+    {
+        if(val.size() == val.capacity()) {
+            sum += v-val[pos];
+            val[pos] = v;
+            if(++pos >= val.size()) pos = 0;
+        }
+        else {
+            sum += v;
+            val.push_back(v);
+        }
+        return *this;
+    }
+
+    T sum;
+    std::vector<T> val;
+    size_t pos;
+};
+
+
 class Clock
 {
 public:
-	void Set(double x,double y,float weight,bool pre = false);
+	void Set(double x,double y,bool pre = false);
 
     double Get(double x) const { return a+b*x; } 
 
@@ -51,6 +146,33 @@ public:
     float Precision() const { return precision; }
     void Precision(float f) { precision = f; }
 
+    float Weight() const 
+    { 
+#ifndef SLIDING
+        return weight; 
+#else
+        return 1-pow(10.f,-1.f/(float)s.size());
+#endif
+    }
+
+    void Weight(float w) 
+    { 
+#ifndef SLIDING
+        weight = w; 
+#else
+        int sz;
+        if(w < 0)
+            sz = MAXSLIDING;
+        else if(w >= 1)
+            sz = 1;
+        else
+            sz = std::min((int)(-1/log10(1-w)),MAXSLIDING);
+        s.resize(sz);
+        sx.resize(sz); sy.resize(sz);
+        sxx.resize(sz); sxy.resize(sz);
+#endif
+    }
+
     const t_symbol *const name;
 
 
@@ -68,13 +190,24 @@ public:
 private:
 
     int n;
-    double a,b,s,sx,sy,sxx,sxy;
+    double a,b;
     double prex,prey;
-    float prew;
+
+#ifndef SLIDING
+    double s,sx,sy,sxx,sxy;
+    float weight;
+#else
+    SlidingAvg<double> s,sx,sy,sxx,sxy;
+#endif
 
     Clock(const t_symbol *n,Master *m = NULL)
         : name(n),master(m)
         , precision(1.e-10f)
+#ifndef SLIDING
+        , weight(0.5)
+#else
+        , s(SLIDING),sx(SLIDING),sy(SLIDING),sxx(SLIDING),sxy(SLIDING)
+#endif
     { 
         reset(); 
     }
@@ -89,19 +222,32 @@ private:
 	{
         n = 0;
 		a = b = 0;
+#ifndef SLIDING
         s = sx = sy = sxx = sxy = 0;
+#else
+        s.clear();
+        sx.clear(); sy.clear();
+        sxx.clear(); sxy.clear();
+#endif
 	}
 
-    void add(double x,double y,float w)
+    void add(double x,double y)
     { 
-	    float iw = 1.f-w;
+        ++n;
+#ifndef SLIDING
+	    float w = weight,iw = 1.f-w;
 	    s = s*iw+w;
 	    sx = sx*iw+x*w;
 	    sy = sy*iw+y*w;
 	    sxx = sxx*iw+x*x*w;
 	    sxy = sxy*iw+x*y*w;
-        ++n;
-
+#else
+        s += 1;
+        sx += x;
+        sy += y;
+        sxx += x*x;
+        sxy += x*y;
+#endif
 	    double d = s*sxx-sx*sx;
         if(LIKELY(d)) {
     	    a = (sxx*sy-sx*sxy)/d;

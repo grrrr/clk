@@ -31,16 +31,26 @@ protected:
         pre = true;
     }
 
+    float getweight()
+    {
+        return LIKELY(clock)?clock->Weight():0;
+    }
+
+    void setweight(float w) 
+    {
+        if(LIKELY(clock))
+            clock->Weight(w);
+    }
+
 	void settime(double x,double y) 
     { 
         if(LIKELY(clock))
-            clock->Set(x,y,weight,pre); 
+            clock->Set(x,y,pre); 
         pre = false;
     }
 
     void setcurrent(double y) { settime(Time(),y); }
 
-	float weight;
     bool pre;
 };
 
@@ -60,6 +70,9 @@ public:
 
     void m_message(int argc,const t_atom *argv) { Forward(sym_message,argc,argv); }
 	
+    void mg_weight(float &w) { w = getweight(); }
+    void ms_weight(float w) { setweight(w); }
+
 protected:
 
     static const t_symbol *sym_message,*sym_reset;
@@ -72,6 +85,7 @@ protected:
     FLEXT_CALLBACK_V(m_message)
 	FLEXT_CALLVAR_F(mg_timebase,ms_timebase)
 	FLEXT_CALLVAR_F(mg_precision,ms_precision)
+    FLEXT_CALLVAR_F(mg_weight,ms_weight)
 
     static void Setup(t_classid c);
 };

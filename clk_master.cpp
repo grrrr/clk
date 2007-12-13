@@ -16,8 +16,7 @@ $LastChangedBy$
 namespace clk {
 
 Master::Master(int argc,const t_atom *argv)
-    : weight(0.5)
-    , pre(true)
+    : pre(true)
 {
     const t_symbol *name;
 
@@ -75,6 +74,7 @@ void MasterExt::Setup(t_classid c)
 
     FLEXT_CADDATTR_VAR(c,"timebase",mg_timebase,ms_timebase);
 	FLEXT_CADDATTR_VAR(c,"precision",mg_precision,ms_precision);
+    FLEXT_CADDATTR_VAR(c,"weight",mg_weight,ms_weight);
 }
 
 const t_symbol *MasterExt::sym_message,*MasterExt::sym_reset;
