@@ -19,8 +19,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\flext\source;c:\data\pdmax\pd\src"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2"
+				AdditionalIncludeDirectories="..\flext\source;c:\data\pdmax\pd\src;&quot;C:\data\libs\gmp-4.2.2&quot;;&quot;C:\data\libs\mpfr-2.3.0&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2;xBIGNUM"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"

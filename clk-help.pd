@@ -1,4 +1,4 @@
-#N canvas 339 296 1109 566 12;
+#N canvas 327 296 1117 574 12;
 #X obj 156 230 symbol \$0-int;
 #X obj 156 254 symbol \$0-sync;
 #X obj 156 278 symbol \$0-tap;
@@ -20,7 +20,7 @@
 #X obj 26 301 bng 25 250 50 0 empty empty get_time 0 -6 0 8 -258699
 -1 -1;
 #X obj 790 91 metro 700;
-#X obj 790 76 tgl 15 0 empty empty empty 0 -6 0 8 -260818 -1 -1 0 1
+#X obj 790 76 tgl 15 0 empty empty empty 0 -6 0 8 -260818 -1 -1 1 1
 ;
 #X floatatom 181 484 5 0 0 0 - - -;
 #X floatatom 108 513 8 0 0 0 - - -;
@@ -44,14 +44,14 @@
 #X restore 383 144 pd inc;
 #X floatatom 822 74 5 0 0 0 - - -;
 #X obj 383 106 metro 200;
-#X msg 955 120 gettaps;
+#X msg 876 122 gettaps;
 #X floatatom 556 476 5 0 0 0 - - -;
 #X floatatom 876 474 5 0 0 0 - - -;
 #X msg 514 387 stop;
 #X msg 475 387 10;
 #X msg 841 378 stop;
 #X msg 477 89 reset;
-#X msg 954 96 reset;
+#X msg 875 98 reset;
 #X msg 24 390 reset;
 #X msg 476 357 reset;
 #X msg 802 348 reset;
@@ -143,6 +143,10 @@
 #X text 547 272 time before the first time info);
 #X text 272 13 syncable clock objects \, (C)2006-2007 Thomas Grill
 ;
+#X msg 957 120 weight \$1;
+#X msg 957 144 getweight;
+#X obj 961 97 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 0;
 #X connect 0 0 10 0;
 #X connect 1 0 10 0;
 #X connect 2 0 10 0;
@@ -228,3 +232,6 @@
 #X connect 96 0 11 0;
 #X connect 98 0 79 0;
 #X connect 99 0 98 0;
+#X connect 104 0 70 0;
+#X connect 105 0 70 0;
+#X connect 106 0 104 0;

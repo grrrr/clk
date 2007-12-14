@@ -20,9 +20,15 @@ $LastChangedBy$
 #include <map>
 #include <vector>
 #include <stdexcept>
+#include <iostream>
 
 #define SLIDING 10
 #define MAXSLIDING 1000
+
+#ifdef BIGNUM
+#include <gmp.h>
+#include <mpfr.h>
+#endif
 
 namespace clk {
 
@@ -32,15 +38,53 @@ inline double Time() { return flext::GetTime(); }
 class Master;
 class Client;
 
+#ifdef BIGNM
+class BigNum
+{
+public:
+    BigNum(double d = 0)
+    {
+        mpfr_init_set_d(&x,d,GMP_RNDN);
+    }
+
+/*
+    BigNum &operator =(const BigNum &b)
+    {
+        mpfr_set(&x,&b.x,GMP_RNDN);
+        return *this;
+    }
+*/
+    BigNum &operator +=(const BigNum &b)
+    {
+        mpfr_add(&x,&x,&b.x,GMP_RNDN);
+        return *this;
+    }
+
+    BigNum operator +(const BigNum &b)
+    {
+        return BigNum(*this);
+    }
+
+    operator double() const 
+    {
+        return mpfr_get_d(&x,GMP_RNDN);
+    }
+
+private:
+    mpfr_t x;
+};
+#else
+typedef double BigNum;
+#endif
+
 
 template <class T>
 class SlidingAvg
 {
 public:
     SlidingAvg(int sz)
-        : sum(0),pos(0)
+        : sum(0),pos(0),maxsz(sz)
     {
-        val.reserve(sz);
     }
 
     operator T() const 
@@ -56,16 +100,17 @@ public:
         return *this;
     }
 
-    size_t size() const { return val.capacity(); }
+    size_t size() const { return maxsz; }
 
     SlidingAvg &resize(size_t sz)
     {
         if(sz < val.size()) {
             // preserve values
-            rotate(-(int)pos);
+            rotate((int)pos);
             pos = 0;
+            val.resize(sz);
         }
-        val.reserve(sz);
+        maxsz = sz;
         return recalc();
     }
 
@@ -106,7 +151,7 @@ public:
 
     SlidingAvg operator +=(T v)
     {
-        if(val.size() == val.capacity()) {
+        if(val.size() == maxsz) {
             sum += v-val[pos];
             val[pos] = v;
             if(++pos >= val.size()) pos = 0;
@@ -120,8 +165,18 @@ public:
 
     T sum;
     std::vector<T> val;
-    size_t pos;
+    size_t pos,maxsz;
 };
+
+template <class T>
+static std::ostream &operator <<(std::ostream &s,SlidingAvg<T> &sa)
+{
+    s << &sa << ":" << sa.val.size() << "(" << sa.maxsz << ") - " << sa.pos << "[";
+    for(std::vector<T>::const_iterator it = sa.val.begin(); it != sa.val.end(); ++it)
+        s << *it << ' ';
+    return s << "]";
+}
+
 
 
 class Clock
@@ -166,10 +221,12 @@ public:
         else if(w >= 1)
             sz = 1;
         else
-            sz = std::min((int)(-1/log10(1-w)),MAXSLIDING);
+            sz = std::max(std::min((int)(-1/log10(1-w)+0.5),MAXSLIDING),1);
+//        std::cerr << sx << std::endl;
         s.resize(sz);
         sx.resize(sz); sy.resize(sz);
         sxx.resize(sz); sxy.resize(sz);
+//        std::cerr << sx << std::endl;
 #endif
     }
 
@@ -194,10 +251,10 @@ private:
     double prex,prey;
 
 #ifndef SLIDING
-    double s,sx,sy,sxx,sxy;
+    BigNum s,sx,sy,sxx,sxy;
     float weight;
 #else
-    SlidingAvg<double> s,sx,sy,sxx,sxy;
+    SlidingAvg<BigNum> s,sx,sy,sxx,sxy;
 #endif
 
     Clock(const t_symbol *n,Master *m = NULL)
@@ -248,13 +305,15 @@ private:
         sxx += x*x;
         sxy += x*y;
 #endif
-	    double d = s*sxx-sx*sx;
+	    BigNum d = s*sxx-sx*sx;
         if(LIKELY(d)) {
     	    a = (sxx*sy-sx*sxy)/d;
 	        b = (s*sxy-sx*sy)/d;
         }
         else
             a = b = 0;
+
+//        fprintf(stderr,"%i: %lf %lf %lf %lf %lf, %lf -> %lf %lf\n",n,(double)s,(double)sx,(double)sy,(double)sxx,(double)sxy,d,a,b);
     }
 
     Master *master;
