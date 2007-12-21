@@ -11,7 +11,7 @@ $LastChangedBy$
 */
 
 #include "clk_client.h"
-#include <math.h>
+#include <cmath>
 
 #define LIMIT 1.e-4f
 

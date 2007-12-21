@@ -12,7 +12,7 @@ $LastChangedBy$
 
 #include "clk.h"
 
-#define CLK_VERSION "0.2.0"
+#define CLK_VERSION "0.2.1"
 
 namespace clk {
 
