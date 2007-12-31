@@ -1,0 +1,8 @@
+#N canvas 566 202 672 486 12;
+#X obj 78 148 clk.time;
+#X msg 127 83 name _____;
+#X msg 125 114 message Hello;
+#X msg 126 55 name;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
