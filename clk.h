@@ -179,7 +179,14 @@ class Clock
 public:
 	void Set(double x,double y,bool pre = false);
 
-    double Get(double x) const { FLEXT_ASSERT(n > 1); return a+b*(BigNum(x)-x0); } 
+    double Get(double x) const 
+    { 
+//        FLEXT_ASSERT(n > 1); 
+        if(n <= 1)
+            return 0;
+        else
+            return a+b*(BigNum(x)-x0); 
+    } 
 
 	double Current() const { return Get(Time()); }
 
