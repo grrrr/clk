@@ -38,29 +38,25 @@ public:
         FLEXT_ASSERT(clock);
 
         if(intv == i) return;
-
-        if(i) {
-            if(!intv) {
-                cnt = 0;
-                reset();   
-            }
-            check.Delay(0);
-        }
-        else {
-            cnt = 0;
-            check.Reset();
+    
+        if(intv < 0) {
+            // first time hint
+            settime(flext::GetTime()-1,clock->Time()-1);
         }
         intv = i;
 
-        const double t = clock->Time();
-    	settime(cnt++,t-1);
-	    settime(cnt++,t);
+        check.Reset();
+
+        if(intv)
+            CbCheck();
+        else
+    	    settime(flext::GetTime(),clock->Time());
     }
 
 	void CbCheck(void * = NULL) 
 	{ 
         FLEXT_ASSERT(clock);
-		settime(cnt++,clock->Time());
+		settime(flext::GetTime(),clock->Time());
         check.Delay(intv*1000);
 	}
 
@@ -70,8 +66,7 @@ public:
     }
 
     Timer check;
-    double intv;
-    int cnt;
+    double cnt,intv;
 
 	FLEXT_CALLSET_F(ms_interval)
 	FLEXT_ATTRGET_F(intv)

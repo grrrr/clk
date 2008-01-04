@@ -48,7 +48,7 @@ protected:
 
 	void settime(double x,double y) 
     { 
-        fprintf(stderr,"TIME %lf %lf\n",x,y);
+//        fprintf(stderr,"TIME %lf %lf\n",x,y);
         if(LIKELY(clock))
             clock->Set(x,y,pre); 
         pre = false;

@@ -1,7 +1,7 @@
 /* 
 clk - syncable clocking objects
 
-Copyright (c)2006-2007 Thomas Grill (gr@grrrr.org)
+Copyright (c)2006-2008 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -20,7 +20,7 @@ static void clk_main()
 {
 	flext::post("----------------------------------------");
 	flext::post("clk - syncable clocking objects");
-    flext::post("version " CLK_VERSION " (c)2006-2007 Thomas Grill");
+    flext::post("version " CLK_VERSION " (c)2006-2008 Thomas Grill");
 #ifdef FLEXT_DEBUG
     flext::post("");
     flext::post("DEBUG BUILD - " __DATE__ " " __TIME__);
