@@ -22,9 +22,6 @@ $LastChangedBy$
 #include <stdexcept>
 #include <iostream>
 
-#define SLIDING 10
-#define MAXSLIDING 1000
-
 #ifdef BIGNUM
 #include <gmp.h>
 #include <mpfr.h>
@@ -32,8 +29,6 @@ $LastChangedBy$
 
 namespace clk {
 
-
-inline double Time() { return flext::GetTime(); }
 
 class Master;
 class Client;
@@ -184,7 +179,14 @@ class Clock
 public:
 	void Set(double x,double y,bool pre = false);
 
-    double Get(double x) const { return a+b*x; } 
+    double Get(double x) const 
+    { 
+//        FLEXT_ASSERT(n > 1); 
+        if(n <= 1)
+            return 0;
+        else
+            return a+b*(BigNum(x)-x0); 
+    } 
 
 	double Current() const { return Get(Time()); }
 
@@ -201,34 +203,11 @@ public:
     float Precision() const { return precision; }
     void Precision(float f) { precision = f; }
 
-    float Weight() const 
-    { 
-#ifndef SLIDING
-        return weight; 
-#else
-        return 1-pow(10.f,-1.f/(float)s.size());
-#endif
-    }
+    float Weight() const { return weight; }
+    void Weight(float w) { weight = w; }
 
-    void Weight(float w) 
-    { 
-#ifndef SLIDING
-        weight = w; 
-#else
-        int sz;
-        if(w < 0)
-            sz = MAXSLIDING;
-        else if(w >= 1)
-            sz = 1;
-        else
-            sz = std::max(std::min((int)(-1/log10(1-w)+0.5),MAXSLIDING),1);
-//        std::cerr << sx << std::endl;
-        s.resize(sz);
-        sx.resize(sz); sy.resize(sz);
-        sxx.resize(sz); sxy.resize(sz);
-//        std::cerr << sx << std::endl;
-#endif
-    }
+    bool Logical() const { return logical; }
+    void Logical(bool l) { logical = l; }
 
     const t_symbol *const name;
 
@@ -244,27 +223,27 @@ public:
     const Master *GetMaster() const { return master; }
     const Clients &GetClients() const { return clients; }
 
+
+    double Time(bool logical = true) const
+    { 
+        return logical?flext::GetTime():flext::GetOSTime(); 
+    }
+
 private:
 
+    bool logical;
     int n;
-    double a,b;
     double prex,prey;
 
-#ifndef SLIDING
-    BigNum s,sx,sy,sxx,sxy;
+    BigNum x1,y1;
+    BigNum x0,a,b;
     float weight;
-#else
-    SlidingAvg<BigNum> s,sx,sy,sxx,sxy;
-#endif
 
     Clock(const t_symbol *n,Master *m = NULL)
         : name(n),master(m)
+        , logical(true)
         , precision(1.e-10f)
-#ifndef SLIDING
         , weight(0.5)
-#else
-        , s(SLIDING),sx(SLIDING),sy(SLIDING),sxx(SLIDING),sxy(SLIDING)
-#endif
     { 
         reset(); 
     }
@@ -278,42 +257,33 @@ private:
 	void reset()
 	{
         n = 0;
-		a = b = 0;
-#ifndef SLIDING
-        s = sx = sy = sxx = sxy = 0;
-#else
-        s.clear();
-        sx.clear(); sy.clear();
-        sxx.clear(); sxy.clear();
-#endif
+		x0 = a = b = 0;
 	}
 
     void add(double x,double y)
     { 
-        ++n;
-#ifndef SLIDING
-	    float w = weight,iw = 1.f-w;
-	    s = s*iw+w;
-	    sx = sx*iw+x*w;
-	    sy = sy*iw+y*w;
-	    sxx = sxx*iw+x*x*w;
-	    sxy = sxy*iw+x*y*w;
-#else
-        s += 1;
-        sx += x;
-        sy += y;
-        sxx += x*x;
-        sxy += x*y;
-#endif
-	    BigNum d = s*sxx-sx*sx;
-        if(LIKELY(d)) {
-    	    a = (sxx*sy-sx*sxy)/d;
-	        b = (s*sxy-sx*sy)/d;
-        }
-        else
-            a = b = 0;
+        const BigNum _x = x,_y = y;
 
-//        fprintf(stderr,"%i: %lf %lf %lf %lf %lf, %lf -> %lf %lf\n",n,(double)s,(double)sx,(double)sy,(double)sxx,(double)sxy,d,a,b);
+        if(LIKELY(n)) {
+            if(LIKELY(_x != x1)) {
+                const BigNum _a = (_y+y1)/2;
+                const BigNum _b = (_y-y1)/(_x-x1);
+                const BigNum _x0 = (_x+x1)/2;
+                if(LIKELY(n > 1)) {
+                    double w = weight,wi = 1-w;
+                    x0 = x0*wi+_x0*w;                           
+                    b = b*wi+_b*w;                           
+                    a = a*wi+_a*w;                           
+                }
+                else
+                    x0 = _x0,b = _b,a = _a;
+            }
+        }
+
+        x1 = _x,y1 = _y;
+        ++n;
+
+        //        fprintf(stderr,"%i: %lf %lf %lf %lf %lf, %lf -> %lf %lf\n",n,(double)s,(double)sx,(double)sy,(double)sxx,(double)sxy,d,a,b);
     }
 
     Master *master;

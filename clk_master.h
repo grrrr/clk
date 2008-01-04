@@ -1,7 +1,7 @@
 /* 
 clk - syncable clocking objects
 
-Copyright (c)2006 Thomas Grill (gr@grrrr.org)
+Copyright (c)2006-2007 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -31,7 +31,7 @@ protected:
         pre = true;
     }
 
-    float getweight()
+    float getweight() const
     {
         return LIKELY(clock)?clock->Weight():0;
     }
@@ -42,14 +42,24 @@ protected:
             clock->Weight(w);
     }
 
+    bool getlogical() const { return LIKELY(clock) && clock->Logical(); }
+
+    void setlogical(bool l) { if(LIKELY(clock)) clock->Logical(l); }
+
 	void settime(double x,double y) 
     { 
+//        fprintf(stderr,"TIME %lf %lf\n",x,y);
         if(LIKELY(clock))
             clock->Set(x,y,pre); 
         pre = false;
     }
 
-    void setcurrent(double y) { settime(Time(),y); }
+    void setcurrent(double y) 
+    { 
+        if(LIKELY(clock))
+            clock->Set(clock->Time(),y,pre); 
+        pre = false;
+    }
 
     bool pre;
 };
@@ -70,8 +80,11 @@ public:
 
     void m_message(int argc,const t_atom *argv) { Forward(sym_message,argc,argv); }
 	
-    void mg_weight(float &w) { w = getweight(); }
+    void mg_weight(float &w) const { w = getweight(); }
     void ms_weight(float w) { setweight(w); }
+
+    void mg_logical(bool &l) const { l = getlogical(); }
+    void ms_logical(bool l) { setlogical(l); }
 
 protected:
 
@@ -86,6 +99,7 @@ protected:
 	FLEXT_CALLVAR_F(mg_timebase,ms_timebase)
 	FLEXT_CALLVAR_F(mg_precision,ms_precision)
     FLEXT_CALLVAR_F(mg_weight,ms_weight)
+    FLEXT_CALLVAR_B(mg_logical,ms_logical)
 
     static void Setup(t_classid c);
 };

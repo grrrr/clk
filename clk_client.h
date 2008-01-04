@@ -55,7 +55,7 @@ protected:
 	} 
 
 	double Convert(double time) const { return (time+offset)*factor; }
-	double Current(double offs = 0) const { return Convert(clock->Get(Time()+offs)); }
+	double Current(double offs = 0) const { return Convert(clock->Get(clock->Time()+offs)); }
 
     void Factor(double f) 
     {

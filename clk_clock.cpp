@@ -11,30 +11,23 @@ $LastChangedBy$
 */
 
 #include "clk_client.h"
-#include <math.h>
+#include <cmath>
 
 namespace clk {
 
 void Clock::Set(double x,double y,bool pre)
 { 
     if(UNLIKELY(pre && n)) {
+        // there are statistics already... preserve existing factor
+
         n = -1;
         prex = x,prey = y;
 
         double f = Factor();
         reset();
 
-#ifndef SLIDING
-        float w = weight;
-        weight = 1;
-        add(x,y);
-        weight = 0.5;
-        add(x+1,y+f);
-        weight = w;
-#else
         add(x,y);
         add(x+1,y+f);
-#endif
     }
     else {
         double t = Time();
