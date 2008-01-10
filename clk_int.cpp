@@ -1,7 +1,7 @@
 /* 
 clk - syncable clocking objects
 
-Copyright (c)2006-2007 Thomas Grill (gr@grrrr.org)
+Copyright (c)2006-2008 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -39,17 +39,22 @@ public:
 
         if(intv == i) return;
     
-        if(intv < 0) {
-            // first time hint
+        // first time hint, or change between physical and logical?
+        bool change = intv < 0 || bool(intv) != bool(i);
+
+        if(change) {
+            check.Reset(); // unset checking timer
+            clock->Logical(i == 0);
+//            clock->reset();
             settime(flext::GetTime()-1,clock->Time()-1);
         }
         intv = i;
 
-        check.Reset();
-
         if(intv)
+            // physical, start checking timer
             CbCheck();
         else
+            // logical, no checking timer
     	    settime(flext::GetTime(),clock->Time());
     }
 
@@ -57,7 +62,7 @@ public:
 	{ 
         FLEXT_ASSERT(clock);
 		settime(flext::GetTime(),clock->Time());
-        check.Delay(intv*1000);
+        check.Delay(intv);
 	}
 
     static void Setup(t_classid c)

@@ -1,7 +1,7 @@
 /* 
 clk - syncable clocking objects
 
-Copyright (c)2006-2007 Thomas Grill (gr@grrrr.org)
+Copyright (c)2006-2008 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -224,9 +224,9 @@ public:
     const Clients &GetClients() const { return clients; }
 
 
-    double Time(bool logical = true) const
+    double Time() const
     { 
-        return logical?flext::GetTime():flext::GetOSTime(); 
+        return logical?flext::GetTime():(flext::GetOSTime()-calibrate); 
     }
 
 private:
@@ -238,6 +238,7 @@ private:
     BigNum x1,y1;
     BigNum x0,a,b;
     float weight;
+    double calibrate;
 
     Clock(const t_symbol *n,Master *m = NULL)
         : name(n),master(m)
@@ -258,6 +259,7 @@ private:
 	{
         n = 0;
 		x0 = a = b = 0;
+        calibrate = flext::GetOSTime()-flext::GetTime();
 	}
 
     void add(double x,double y)
