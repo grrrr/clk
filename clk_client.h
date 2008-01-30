@@ -38,24 +38,33 @@ protected:
 
     void ms_name(int argc = 0,const t_atom *argv = NULL);
 
-    void ms_name(const AtomList &l) { ms_name(l.Count(),l.Atoms()); }
+    void ms_name(const AtomList &l) 
+    { 
+        ms_name(l.Count(),l.Atoms()); 
+    }
 
 	void mg_name(AtomList &l) 
     { 
-        if(LIKELY(clock)) SetSymbol(l(1)[0],clock->name); 
+        if(LIKELY(clock)) 
+            SetSymbol(l(1)[0],clock->name); 
     }
 
 	void m_reset(int argc,const t_atom *argv) 
 	{
-		double o = LIKELY(clock)?-clock->Current():0;
-		if(!argc)
-			offset = o;
-		else
-			offset = o+GetDouble(argc,argv);
+		offset = LIKELY(clock)?-clock->Current():0;
+		if(argc)
+			offset += GetDouble(argc,argv);
 	} 
 
-	double Convert(double time) const { return (time+offset)*factor; }
-	double Current(double offs = 0) const { return Convert(clock->Get(clock->Time()+offs)); }
+	double Convert(double time) const 
+    { 
+        return (time+offset)*factor; 
+    }
+
+	double Current(double offs = 0) const 
+    { 
+        return Convert(clock->Get(clock->Time()+offs)); 
+    }
 
     void Factor(double f) 
     {
@@ -136,7 +145,12 @@ protected:
     static const t_symbol *sym_message;
 
     void Forward(const t_symbol *sym,int argc,const t_atom *argv);
-    void Message(const t_symbol *sym,int argc,const t_atom *argv) { ToOutAnything(GetOutAttr(),sym,argc,argv); }
+
+    void Message(const t_symbol *sym,int argc,const t_atom *argv) 
+    { 
+        // forward messages non-instantly to avoid potential feedback loops/reentrancy problems
+        ToQueueAnything(GetOutAttr(),sym,argc,argv); 
+    }
 
 	virtual bool CbDsp();
 

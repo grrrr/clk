@@ -25,9 +25,7 @@ void Clock::Set(double x,double y,bool pre)
 
         double f = Factor();
         reset();
-
-        add(x,y);
-        add(x+1,y+f);
+        initfactor(x,y,f);
     }
     else {
         double t = Time();

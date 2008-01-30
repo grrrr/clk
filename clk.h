@@ -195,9 +195,13 @@ public:
 
 	void Factor(double f)
     {
+        double t = Time();
+        double c = Get(t);
+//        printf("CURRENT1 %lf->%lf\n",t,c);
         reset();
-        n = -1;
-        b = f;
+        // simulate existing data
+        initfactor(t,c,f);
+//        printf("CURRENT2 %lf->%lf\n",t,Get(t));
     }
 
     float Precision() const { return precision; }
@@ -286,6 +290,12 @@ private:
         ++n;
 
         //        fprintf(stderr,"%i: %lf %lf %lf %lf %lf, %lf -> %lf %lf\n",n,(double)s,(double)sx,(double)sy,(double)sxx,(double)sxy,d,a,b);
+    }
+
+    void initfactor(double x,double y,double f)
+    {
+        add(x-0.5,y-f/2);
+        add(x+0.5,y+f/2);
     }
 
     Master *master;

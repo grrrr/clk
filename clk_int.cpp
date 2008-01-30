@@ -40,7 +40,7 @@ public:
         if(intv == i) return;
     
         // first time hint, or change between physical and logical?
-        bool change = intv < 0 || bool(intv) != bool(i);
+        bool change = intv < 0 || (intv != 0) != (i != 0);
 
         if(change) {
             check.Reset(); // unset checking timer

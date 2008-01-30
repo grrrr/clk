@@ -25,9 +25,15 @@ public:
     {
     }
 
-	void m_set(double y) { setcurrent(y); }
+	void m_set(double y) 
+    { 
+        setcurrent(y); 
+    }
 
-    void m_double(float a,float b)  { setcurrent((double)a+(double)b); }
+    void m_double(float a,float b)  
+    { 
+        setcurrent((double)a+(double)b); 
+    }
 
 protected:
     FLEXT_CALLBACK(m_reset)

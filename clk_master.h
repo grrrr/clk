@@ -91,7 +91,12 @@ protected:
     static const t_symbol *sym_message,*sym_reset;
 
     void Forward(const t_symbol *sym,int argc,const t_atom *argv);
-    void Message(const t_symbol *sym,int argc,const t_atom *argv) { ToOutAnything(GetOutAttr(),sym,argc,argv); }
+
+    void Message(const t_symbol *sym,int argc,const t_atom *argv) 
+    { 
+        // forward messages non-instantly to avoid potential feedback loops/reentrancy problems
+        ToQueueAnything(GetOutAttr(),sym,argc,argv); 
+    }
 
 	double current() const { return clock->Current(); }
 
