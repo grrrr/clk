@@ -94,8 +94,7 @@ protected:
 
     void Message(const t_symbol *sym,int argc,const t_atom *argv) 
     { 
-        // forward messages non-instantly to avoid potential feedback loops/reentrancy problems
-        ToQueueAnything(GetOutAttr(),sym,argc,argv); 
+        ToOutAnything(GetOutAttr(),sym,argc,argv); 
     }
 
 	double current() const { return clock->Current(); }
