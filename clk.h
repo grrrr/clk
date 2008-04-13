@@ -139,7 +139,7 @@ public:
     SlidingAvg &recalc()
     {
         sum = 0;
-        for(std::vector<T>::const_iterator it = val.begin(); it != val.end(); ++it)
+        for(typename std::vector<T>::const_iterator it = val.begin(); it != val.end(); ++it)
             sum += *it;
         return *this;
     }
@@ -167,7 +167,7 @@ template <class T>
 static std::ostream &operator <<(std::ostream &s,SlidingAvg<T> &sa)
 {
     s << &sa << ":" << sa.val.size() << "(" << sa.maxsz << ") - " << sa.pos << "[";
-    for(std::vector<T>::const_iterator it = sa.val.begin(); it != sa.val.end(); ++it)
+    for(typename std::vector<T>::const_iterator it = sa.val.begin(); it != sa.val.end(); ++it)
         s << *it << ' ';
     return s << "]";
 }
