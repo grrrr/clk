@@ -12,6 +12,7 @@ $LastChangedBy$
 
 #include "clk_master.h"
 #include "clk_client.h"
+#include <cstdio>
 
 namespace clk {
 
