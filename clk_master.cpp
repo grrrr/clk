@@ -6,7 +6,7 @@ For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
 $LastChangedRevision$
-$LastChangedDate $
+$LastChangedDate$
 $LastChangedBy$
 */
 
